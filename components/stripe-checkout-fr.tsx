@@ -43,36 +43,49 @@ export function StripeCheckoutFr({ items, onInitiateCheckout, bonusData }: Strip
   const [loading, setLoading] = useState(false)
 
   const fetchClientSecret = useCallback(async () => {
-    const eventId = `purchase_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    try {
+      const eventId = `purchase_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
-    const totalValue = items.reduce((sum, item) => {
-      const price = item.product.salePrice || item.product.price
-      return sum + price * item.quantity
-    }, 0)
+      const totalValue = items.reduce((sum, item) => {
+        const price = item.product.salePrice || item.product.price
+        return sum + price * item.quantity
+      }, 0)
 
-    const tiktokItems = formatCartForTikTok(items)
+      const tiktokItems = formatCartForTikTok(items)
 
-    storePurchaseData({
-      contents: tiktokItems,
-      value: totalValue,
-      currency: "EUR",
-      event_id: eventId,
-    })
+      storePurchaseData({
+        contents: tiktokItems,
+        value: totalValue,
+        currency: "EUR",
+        event_id: eventId,
+      })
 
-    const getCookie = (name: string) => {
-      const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"))
-      return match ? decodeURIComponent(match[2]) : undefined
+      const getCookie = (name: string) => {
+        const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"))
+        return match ? decodeURIComponent(match[2]) : undefined
+      }
+      const fbc = getCookie("_fbc")
+      const fbp = getCookie("_fbp")
+
+      console.log("[v0] Creating checkout session for items:", items.length)
+      
+      const result = await createCheckoutSessionFr(items, window.location.origin, {
+        eventId,
+        eventSourceUrl: window.location.href,
+        fbc,
+        fbp,
+      })
+      
+      if (!result.clientSecret) {
+        throw new Error("No client secret returned from server")
+      }
+      
+      console.log("[v0] Checkout session created successfully")
+      return result.clientSecret
+    } catch (error) {
+      console.error("[v0] Error creating checkout session:", error)
+      throw error
     }
-    const fbc = getCookie("_fbc")
-    const fbp = getCookie("_fbp")
-
-    const { clientSecret } = await createCheckoutSessionFr(items, window.location.origin, {
-      eventId,
-      eventSourceUrl: window.location.href,
-      fbc,
-      fbp,
-    })
-    return clientSecret!
   }, [items])
 
   const handleStartCheckout = async () => {

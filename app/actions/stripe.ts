@@ -283,8 +283,11 @@ export async function createCheckoutSessionFr(items: CartItem[], origin: string,
       locale: "fr",
       line_items: lineItems,
 
-      // ✅ Apenas cartão por enquanto — universal e sem dependência de ativação
-      payment_method_types: ["card"],
+      // ✅ Deixar Stripe decidir métodos de pagamento automaticamente
+      // Isso permite Link, Apple Pay, Google Pay e cartões conforme disponibilidade
+      automatic_payment_methods: {
+        enabled: true,
+      },
 
       // ✅ Frete grátis explícito — reduz abandono
       shipping_options: [
@@ -335,8 +338,18 @@ export async function createCheckoutSessionFr(items: CartItem[], origin: string,
 
     return { clientSecret: session.client_secret }
   } catch (error: any) {
-    console.error("[Stripe FR] createCheckoutSessionFr error:", error?.message || error)
-    throw new Error(error?.message || "Erreur lors de la création de la session de paiement")
+    console.error("[Stripe FR] createCheckoutSessionFr error:", {
+      message: error?.message,
+      type: error?.type,
+      code: error?.code,
+      raw: error?.raw,
+      statusCode: error?.statusCode,
+    })
+    
+    // Re-throw with more detail for debugging
+    const errorMessage = error?.message || "Erreur lors de la création de la session de paiement"
+    const errorCode = error?.code ? ` (Code: ${error.code})` : ""
+    throw new Error(`${errorMessage}${errorCode}`)
   }
 }
 // ──────────────────────────────────────────────────────────────────────────────
