@@ -73,7 +73,7 @@ export async function sendCAPIEvent(params: {
   }
   customData?: CustomData
 }): Promise<{ success: boolean; error?: string }> {
-  const accessToken = process.env.META_ACCESS_TOKEN
+  const accessToken = process.env.FACEBOOK_TOKEN || process.env.META_ACCESS_TOKEN
 
   if (!accessToken) {
     console.error("[Meta CAPI] META_ACCESS_TOKEN not configured")
@@ -129,7 +129,7 @@ export async function sendCAPIEvent(params: {
   }
 
   try {
-    const pixelId = process.env.META_PIXEL_ID || "1139772708143683"
+    const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || process.env.META_PIXEL_ID || "1139772708143683"
 
     const response = await fetch(
       `https://graph.facebook.com/${META_API_VERSION}/${pixelId}/events?access_token=${accessToken}`,
