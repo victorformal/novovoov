@@ -35,6 +35,7 @@ import { RatingBreakdownFr } from "@/components/rating-breakdown-fr"
 import { SalesNotificationToast } from "@/components/sales-notification-toast"
 import { BonusModalFr } from "@/components/bonus-modal-fr"
 import { BonusProgressBar } from "@/components/bonus-progress-bar"
+import { VideoGalleryFr } from "@/components/video-gallery-fr"
 
 interface ClientProductPageProps {
   product: any
@@ -532,6 +533,9 @@ export default function ClientProductPage({
 
             {/* Panel Calculator - FR only */}
             {isFrenchVersion && isFlexibleAcousticPanel && <PanelCalculatorFr />}
+
+            {/* Video Gallery - FR only */}
+            {isFrenchVersion && isFlexibleAcousticPanel && <VideoGalleryFr />}
 
             {/* Acoustic Line Section - Only for Flexible Acoustic Panel */}
             {isFlexibleAcousticPanel && (
