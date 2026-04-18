@@ -297,12 +297,6 @@ export async function createCheckoutSessionFr(items: CartItem[], origin: string,
       locale: "fr",
       line_items: lineItems,
 
-      // ✅ Deixar Stripe decidir métodos de pagamento automaticamente
-      // Isso permite Link, Apple Pay, Google Pay e cartões conforme disponibilidade
-      automatic_payment_methods: {
-        enabled: true,
-      },
-
       // ✅ Frete grátis explícito — reduz abandono
       shipping_options: [
         {
