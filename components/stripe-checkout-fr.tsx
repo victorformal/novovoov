@@ -5,7 +5,7 @@ import { loadStripe } from "@stripe/stripe-js"
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js"
 import { createCheckoutSessionFr } from "@/app/actions/stripe"
 import { formatCartForTikTok, storePurchaseData } from "@/lib/tiktok-events"
-import { Loader2, Lock, Gift, Check, Wrench } from "lucide-react"
+import { Loader2, Lock, Gift, Check, Wrench, AlertCircle, RefreshCw } from "lucide-react"
 import Image from "next/image"
 
 const CLEANER_IMAGE = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/CLEAN04-jsHtrQ87vwg45Qyo5RrSkzrJbV2MXC.jpg"
@@ -41,9 +41,11 @@ interface StripeCheckoutFrProps {
 export function StripeCheckoutFr({ items, onInitiateCheckout, bonusData }: StripeCheckoutFrProps) {
   const [showCheckout, setShowCheckout] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchClientSecret = useCallback(async () => {
     try {
+      setError(null)
       const eventId = `purchase_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
       const totalValue = items.reduce((sum, item) => {
@@ -82,18 +84,53 @@ export function StripeCheckoutFr({ items, onInitiateCheckout, bonusData }: Strip
       
       console.log("[v0] Checkout session created successfully")
       return result.clientSecret
-    } catch (error) {
-      console.error("[v0] Error creating checkout session:", error)
-      throw error
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Une erreur est survenue"
+      console.error("[v0] Error creating checkout session:", errorMessage)
+      setError(errorMessage)
+      throw err
     }
   }, [items])
 
   const handleStartCheckout = async () => {
     if (items.length === 0) return
     setLoading(true)
+    setError(null)
     onInitiateCheckout?.()
     setShowCheckout(true)
     setLoading(false)
+  }
+
+  const handleRetry = () => {
+    setError(null)
+    setShowCheckout(false)
+    // Small delay before restarting
+    setTimeout(() => {
+      handleStartCheckout()
+    }, 100)
+  }
+
+  if (error) {
+    return (
+      <div className="w-full space-y-4">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-red-800">Une erreur est survenue</p>
+              <p className="text-xs text-red-700 mt-1">{error}</p>
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={handleRetry}
+          className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold text-base py-3 px-6 transition-colors duration-200"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Reessayer
+        </button>
+      </div>
+    )
   }
 
   if (showCheckout) {
@@ -101,7 +138,7 @@ export function StripeCheckoutFr({ items, onInitiateCheckout, bonusData }: Strip
       <div className="w-full space-y-3">
         <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
           <Lock className="h-3 w-3" />
-          Paiement 100% Sécurisé SSL • Visa, Mastercard, American Express
+          Paiement 100% Securise SSL - Visa, Mastercard, American Express
         </p>
 
         {/* Bonus items reminder before payment */}
@@ -152,8 +189,21 @@ export function StripeCheckoutFr({ items, onInitiateCheckout, bonusData }: Strip
           </div>
         )}
 
-        <EmbeddedCheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
-          <EmbeddedCheckout />
+        <EmbeddedCheckoutProvider 
+          stripe={stripePromise} 
+          options={{ 
+            fetchClientSecret,
+            onComplete: () => {
+              console.log("[v0] Checkout completed")
+            }
+          }}
+        >
+          <EmbeddedCheckout 
+            onLoadError={(err) => {
+              console.error("[v0] EmbeddedCheckout load error:", err)
+              setError(err.error?.message || "Erreur lors du chargement du paiement")
+            }}
+          />
         </EmbeddedCheckoutProvider>
       </div>
     )

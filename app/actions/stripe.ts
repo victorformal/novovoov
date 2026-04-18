@@ -29,10 +29,13 @@ function makeId(prefix: string) {
 
 export async function createCheckoutSession(items: CartItem[], origin: string, trackingData?: TrackingData) {
   try {
+    console.log("[v0] createCheckoutSession called with items:", items.length)
+    
     // ✓ Extract UTM data server-side from cookies
     const utmData = await getUTMDataFromCookie()
 
     if (!items?.length) {
+      console.error("[v0] Cart is empty")
       throw new Error("Cart is empty")
     }
 
@@ -227,8 +230,19 @@ export async function createCheckoutSession(items: CartItem[], origin: string, t
     })
 
     return { clientSecret: session.client_secret }
-  } catch (error) {
-    throw error
+  } catch (error: any) {
+    console.error("[v0] createCheckoutSession error:", {
+      message: error?.message,
+      type: error?.type,
+      code: error?.code,
+      raw: error?.raw,
+      statusCode: error?.statusCode,
+    })
+    
+    // Re-throw with more detail for debugging
+    const errorMessage = error?.message || "Error creating checkout session"
+    const errorCode = error?.code ? ` (Code: ${error.code})` : ""
+    throw new Error(`${errorMessage}${errorCode}`)
   }
 }
 
