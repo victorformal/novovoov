@@ -9,7 +9,7 @@ import {
 import { createCheckoutSession } from "@/app/actions/stripe"
 import { trackAddPaymentInfo, formatCartForTikTok, storePurchaseData } from "@/lib/tiktok-events"
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+import { Loader2, AlertCircle, RefreshCw } from "lucide-react"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -31,55 +31,73 @@ interface StripeCheckoutProps {
 export function StripeCheckout({ items, onInitiateCheckout }: StripeCheckoutProps) {
   const [showCheckout, setShowCheckout] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchClientSecret = useCallback(async () => {
-    // Generate unique event ID for deduplication
-    const eventId = `purchase_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    
-    // Calculate total
-    const totalValue = items.reduce((sum, item) => {
-      const price = item.product.salePrice || item.product.price
-      return sum + price * item.quantity
-    }, 0)
+    try {
+      setError(null)
+      // Generate unique event ID for deduplication
+      const eventId = `purchase_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      
+      // Calculate total
+      const totalValue = items.reduce((sum, item) => {
+        const price = item.product.salePrice || item.product.price
+        return sum + price * item.quantity
+      }, 0)
 
-    // Format items for TikTok
-    const tiktokItems = formatCartForTikTok(items)
+      // Format items for TikTok
+      const tiktokItems = formatCartForTikTok(items)
 
-    // Detect currency from items
-    const currency = items[0]?.product?.currency || 'GBP'
+      // Detect currency from items
+      const currency = items[0]?.product?.currency || 'GBP'
 
-    // Store purchase data for later (when user completes purchase)
-    storePurchaseData({
-      contents: tiktokItems,
-      value: totalValue,
-      currency,
-      event_id: eventId,
-    })
+      // Store purchase data for later (when user completes purchase)
+      storePurchaseData({
+        contents: tiktokItems,
+        value: totalValue,
+        currency,
+        event_id: eventId,
+      })
 
-    // Read Meta cookies _fbc and _fbp from browser
-    const getCookie = (name: string) => {
-      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
-      return match ? decodeURIComponent(match[2]) : undefined
-    }
-    const fbc = getCookie('_fbc')
-    const fbp = getCookie('_fbp')
-
-    const { clientSecret } = await createCheckoutSession(
-      items, 
-      window.location.origin,
-      {
-        eventId,
-        eventSourceUrl: window.location.href,
-        fbc,
-        fbp,
+      // Read Meta cookies _fbc and _fbp from browser
+      const getCookie = (name: string) => {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
+        return match ? decodeURIComponent(match[2]) : undefined
       }
-    )
-    return clientSecret!
+      const fbc = getCookie('_fbc')
+      const fbp = getCookie('_fbp')
+
+      console.log("[v0] Creating checkout session for items:", items.length)
+
+      const { clientSecret } = await createCheckoutSession(
+        items, 
+        window.location.origin,
+        {
+          eventId,
+          eventSourceUrl: window.location.href,
+          fbc,
+          fbp,
+        }
+      )
+      
+      if (!clientSecret) {
+        throw new Error("No client secret returned from server")
+      }
+      
+      console.log("[v0] Checkout session created successfully")
+      return clientSecret
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred"
+      console.error("[v0] Error creating checkout session:", errorMessage)
+      setError(errorMessage)
+      throw err
+    }
   }, [items])
 
   const handleStartCheckout = async () => {
     if (items.length === 0) return
     setLoading(true)
+    setError(null)
     
     // Calculate total and items for TikTok
     const totalValue = items.reduce((sum, item) => {
@@ -104,14 +122,59 @@ export function StripeCheckout({ items, onInitiateCheckout }: StripeCheckoutProp
     setLoading(false)
   }
 
+  const handleRetry = () => {
+    setError(null)
+    setShowCheckout(false)
+    setTimeout(() => {
+      handleStartCheckout()
+    }, 100)
+  }
+
+  if (error) {
+    return (
+      <div className="w-full space-y-4">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-red-800">Something went wrong</p>
+              <p className="text-xs text-red-700 mt-1">{error}</p>
+            </div>
+          </div>
+        </div>
+        <Button
+          onClick={handleRetry}
+          className="w-full"
+          size="lg"
+        >
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Try Again
+        </Button>
+      </div>
+    )
+  }
+
   if (showCheckout) {
     return (
       <div className="w-full space-y-3">
         <p className="text-xs text-muted-foreground text-center">
           Supported payment methods: Card, Apple Pay, Google Pay
         </p>
-        <EmbeddedCheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
-          <EmbeddedCheckout />
+        <EmbeddedCheckoutProvider 
+          stripe={stripePromise} 
+          options={{ 
+            fetchClientSecret,
+            onComplete: () => {
+              console.log("[v0] Checkout completed")
+            }
+          }}
+        >
+          <EmbeddedCheckout 
+            onLoadError={(err) => {
+              console.error("[v0] EmbeddedCheckout load error:", err)
+              setError(err.error?.message || "Error loading payment form")
+            }}
+          />
         </EmbeddedCheckoutProvider>
       </div>
     )
