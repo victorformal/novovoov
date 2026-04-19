@@ -99,7 +99,7 @@ export const products: Product[] = [
     currency: "EUR",
     category: "wall-panels",
     images: [
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneu01-COvuniuy0UAMH2wAwPKmS9Tlev4Qrt.avif",
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Marcenaria%20inteligente%20transforma%20o%20seu%20ambiente.Aqui%2C%20o%20painel%20ripado%20com%20iluminac%CC%A7a%CC%83o%20em%20LED%20vai-yF1rklBPX4o4hpK9rzz1YPn4wkn8tc.jpg",
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau02-qeu9jY1J99l7kquJK3L2fnpKCxJuHj.avif",
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau03-Ji8b2j4tKYBnBXpeqNu9khj7yL7wvV.avif",
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau05-GkWwFoSwI1tdI52JGtLrfokd39EcZ6.avif",
