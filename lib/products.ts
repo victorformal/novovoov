@@ -30,6 +30,7 @@ export interface Product {
   onSale?: boolean
   colors?: ProductColor[]
   video?: string // URL to a product demo video (MP4)
+  videoThumbnail?: string // Thumbnail image for the video
   styles?: ProductStyle[] // Added styles for product variants
   noShipping?: boolean // Skip shipping for this product
   hidden?: boolean // Hide from product listings (only accessible via direct link)
@@ -99,7 +100,7 @@ export const products: Product[] = [
     currency: "EUR",
     category: "wall-panels",
     images: [
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneu01-COvuniuy0UAMH2wAwPKmS9Tlev4Qrt.avif",
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Marcenaria%20inteligente%20transforma%20o%20seu%20ambiente.Aqui%2C%20o%20painel%20ripado%20com%20iluminac%CC%A7a%CC%83o%20em%20LED%20vai-yF1rklBPX4o4hpK9rzz1YPn4wkn8tc.jpg",
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau02-qeu9jY1J99l7kquJK3L2fnpKCxJuHj.avif",
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau03-Ji8b2j4tKYBnBXpeqNu9khj7yL7wvV.avif",
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau05-GkWwFoSwI1tdI52JGtLrfokd39EcZ6.avif",
@@ -108,6 +109,7 @@ export const products: Product[] = [
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau10-st1uB7l391OAmADvAE7RopRDYVevb6.avif",
     ],
     video: "/videos/akupanel-demo.mp4",
+    videoThumbnail: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Captura%20de%20Tela%202026-04-18%20a%CC%80s%2022.59.26-qTSnVeumLFNhUeew486WTm9czu8Dxz.png",
     features: [
       "Support flexible - s'adapte a toute courbe",
       "Couverture de 270x110cm par piece",

@@ -228,7 +228,7 @@ export default function ClientProductPage({
         {/* Product Section */}
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
           {/* Gallery */}
-          <ProductGallery images={product.images} productName={product.name} video={product.video} />
+          <ProductGallery images={product.images} productName={product.name} video={product.video} videoThumbnail={product.videoThumbnail} />
 
           {/* Details */}
           <div className="flex flex-col min-w-0 w-full overflow-hidden max-w-full">
