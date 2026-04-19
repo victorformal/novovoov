@@ -23,6 +23,8 @@ const VIDEOS = [
   },
 ]
 
+
+
 export function VideoGalleryFr() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [currentDot, setCurrentDot] = useState(0)
@@ -133,10 +135,24 @@ export function VideoGalleryFr() {
               ref={(el) => { videoRefs.current[index] = el }}
               src={video.src}
               playsInline
-              preload="metadata"
+              preload="auto"
               loop
               muted
               className="w-full h-full object-cover pointer-events-none"
+              onLoadedData={(e) => {
+                // Force load first frame for mobile
+                const v = e.currentTarget
+                if (v.readyState >= 2) {
+                  v.currentTime = 0.1
+                }
+              }}
+              onSeeked={(e) => {
+                // Reset to beginning after getting frame
+                const v = e.currentTarget
+                if (v.currentTime > 0 && v.paused) {
+                  v.currentTime = 0
+                }
+              }}
             />
 
             {/* Gradient overlay */}
