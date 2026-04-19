@@ -31,7 +31,7 @@ const CONTENT = {
       {
         title: "Efficacite Acoustique",
         text: "Profitez d'une qualite sonore incomparable avec nos panneaux decoratifs a lattes, soigneusement concus pour ameliorer l'acoustique de n'importe quel espace.",
-        image: "/images/acustika-efficiency.jpg",
+        image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Marcenaria%20inteligente%20transforma%20o%20seu%20ambiente.Aqui%2C%20o%20painel%20ripado%20com%20iluminac%CC%A7a%CC%83o%20em%20LED%20vai-yF1rklBPX4o4hpK9rzz1YPn4wkn8tc.jpg",
       },
       {
         title: "Facile a Nettoyer",
