@@ -9,9 +9,10 @@ interface ProductGalleryProps {
   images: string[]
   productName: string
   video?: string
+  videoThumbnail?: string
 }
 
-export function ProductGallery({ images, productName, video }: ProductGalleryProps) {
+export function ProductGallery({ images, productName, video, videoThumbnail }: ProductGalleryProps) {
   // Build ordered items: [img0, video?, img1, img2, ...]
   // Video is inserted at position 1 (second slot) when present
   const orderedItems: Array<{ type: "image"; src: string } | { type: "video" }> = video
@@ -148,12 +149,30 @@ export function ProductGallery({ images, productName, video }: ProductGalleryPro
                   key="video-thumb"
                   onClick={() => handleSelectIndex(index)}
                   className={cn(
-                    "w-10 h-10 sm:w-12 sm:h-12 min-w-[40px] sm:min-w-[48px] min-h-[40px] sm:min-h-[48px] overflow-hidden bg-foreground/90 transition-all flex-shrink-0 flex items-center justify-center",
+                    "w-10 h-10 sm:w-12 sm:h-12 min-w-[40px] sm:min-w-[48px] min-h-[40px] sm:min-h-[48px] overflow-hidden transition-all flex-shrink-0 flex items-center justify-center relative",
                     selectedIndex === index ? "ring-1 ring-foreground" : "opacity-60 hover:opacity-100",
                   )}
                   aria-label="Play video"
                 >
-                  <Play className="h-4 w-4 sm:h-5 sm:w-5 text-background fill-background" />
+                  {videoThumbnail ? (
+                    <>
+                      <Image
+                        src={videoThumbnail}
+                        alt="Video thumbnail"
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover absolute inset-0"
+                        unoptimized={isExternalImage(videoThumbnail)}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <Play className="h-4 w-4 sm:h-5 sm:w-5 text-white fill-white" />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="w-full h-full bg-foreground/90 flex items-center justify-center">
+                      <Play className="h-4 w-4 sm:h-5 sm:w-5 text-background fill-background" />
+                    </div>
+                  )}
                 </button>
               ) : (
                 <button
