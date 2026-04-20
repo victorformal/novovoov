@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { Menu, ShoppingBag, X } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
+import { useLanguage } from "@/lib/language-context"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
@@ -33,14 +34,14 @@ const navigation = {
 }
 
 const languages = [
-  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "fr", name: "Francais", flag: "🇫🇷" },
   { code: "en", name: "English", flag: "🇬🇧" },
 ]
 
 export function Header() {
   const { totalItems } = useCart()
+  const { language, setLanguage, t } = useLanguage()
   const [open, setOpen] = useState(false)
-  const [language, setLanguage] = useState<"fr" | "en">("fr")
 
   const currentNav = navigation[language]
   const currentLang = languages.find((l) => l.code === language)
@@ -107,7 +108,7 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-1 px-2 text-lg">
                 <span>{currentLang?.flag}</span>
-                <span className="sr-only">{language === "fr" ? "Changer de langue" : "Change language"}</span>
+                <span className="sr-only">{t("nav.changeLanguage")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[140px]">
@@ -128,7 +129,7 @@ export function Header() {
           <Link href="/cart" className="relative">
             <Button variant="ghost" size="icon">
               <ShoppingBag className="h-5 w-5" />
-              <span className="sr-only">{language === "fr" ? "Panier" : "Cart"}</span>
+              <span className="sr-only">{t("nav.cart")}</span>
             </Button>
             {totalItems > 0 && (
               <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-xs text-background">

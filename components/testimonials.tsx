@@ -1,35 +1,40 @@
-import { Star } from "lucide-react"
+"use client"
 
-const testimonials = [
-  {
-    name: "Sophie M.",
-    location: "Paris, France",
-    rating: 5,
-    text: "Les panneaux en chene ont completement transforme notre salon. La qualite est exceptionnelle et l'installation a ete etonnamment simple.",
-  },
-  {
-    name: "Marc L.",
-    location: "Lyon, France",
-    rating: 5,
-    text: "Un artisanat magnifique. J'ai commande les panneaux acoustiques pour mon studio a domicile et la difference sonore est remarquable. En plus, ils sont superbes.",
-  },
-  {
-    name: "Emma K.",
-    location: "Bordeaux, France",
-    rating: 5,
-    text: "WOOD BOIS est devenu ma reference pour la decoration interieure. Chaque piece que j'ai achetee semble soigneusement concue et construite pour durer.",
-  },
-]
+import { Star } from "lucide-react"
+import { useLanguage } from "@/lib/language-context"
 
 export function Testimonials() {
+  const { t } = useLanguage()
+
+  const testimonials = [
+    {
+      name: t("testimonials.review1.name"),
+      location: t("testimonials.review1.location"),
+      rating: 5,
+      text: t("testimonials.review1.text"),
+    },
+    {
+      name: t("testimonials.review2.name"),
+      location: t("testimonials.review2.location"),
+      rating: 5,
+      text: t("testimonials.review2.text"),
+    },
+    {
+      name: t("testimonials.review3.name"),
+      location: t("testimonials.review3.location"),
+      rating: 5,
+      text: t("testimonials.review3.text"),
+    },
+  ]
+
   return (
     <section className="bg-secondary/30 py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <span className="mb-4 inline-block text-xs font-medium uppercase tracking-[0.2em] text-accent">Temoignages</span>
-          <h2 className="font-serif text-3xl font-normal sm:text-4xl lg:text-5xl">Ce que Disent nos Clients</h2>
+          <span className="mb-4 inline-block text-xs font-medium uppercase tracking-[0.2em] text-accent">{t("testimonials.badge")}</span>
+          <h2 className="font-serif text-3xl font-normal sm:text-4xl lg:text-5xl">{t("testimonials.title")}</h2>
           <p className="mx-auto mt-5 max-w-2xl text-muted-foreground">
-            Rejoignez des milliers de clients satisfaits qui ont transforme leur maison avec WOOD BOIS.
+            {t("testimonials.subtitle")}
           </p>
         </div>
 

@@ -1,36 +1,41 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
-
-const categories = [
-  {
-    name: "Panneaux Muraux",
-    description: "Acoustiques & decoratifs",
-    href: "/products?category=wall-panels",
-    image: "/category-wall-panels-oak-slat.jpg",
-  },
-  {
-    name: "Eclairage",
-    description: "Lampes & luminaires",
-    href: "/products?category=lighting",
-    image: "/category-lighting-minimalist-lamp.jpg",
-  },
-  {
-    name: "Decoration",
-    description: "Vases & objets",
-    href: "/products?category=decor",
-    image: "/category-decor-ceramic-vase.jpg",
-  },
-]
+import { useLanguage } from "@/lib/language-context"
 
 export function CategoriesSection() {
+  const { t } = useLanguage()
+
+  const categories = [
+    {
+      name: t("categories.wallPanels"),
+      description: t("categories.wallPanelsDesc"),
+      href: "/products?category=wall-panels",
+      image: "/category-wall-panels-oak-slat.jpg",
+    },
+    {
+      name: t("categories.lighting"),
+      description: t("categories.lightingDesc"),
+      href: "/products?category=lighting",
+      image: "/category-lighting-minimalist-lamp.jpg",
+    },
+    {
+      name: t("categories.decor"),
+      description: t("categories.decorDesc"),
+      href: "/products?category=decor",
+      image: "/category-decor-ceramic-vase.jpg",
+    },
+  ]
+
   return (
     <section className="py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-14 text-center">
-          <span className="mb-4 inline-block text-xs font-medium uppercase tracking-[0.2em] text-accent">Parcourir</span>
-          <h2 className="font-serif text-3xl font-normal sm:text-4xl lg:text-5xl">Acheter par Categorie</h2>
+          <span className="mb-4 inline-block text-xs font-medium uppercase tracking-[0.2em] text-accent">{t("categories.browse")}</span>
+          <h2 className="font-serif text-3xl font-normal sm:text-4xl lg:text-5xl">{t("categories.title")}</h2>
           <p className="mx-auto mt-5 max-w-2xl text-muted-foreground">
-            Explorez nos collections soigneusement selectionnees, chacune concue pour apporter chaleur et caractere a votre interieur.
+            {t("categories.subtitle")}
           </p>
         </div>
 

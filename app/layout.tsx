@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
 import { Suspense } from "react"
 import { CartProvider } from "@/lib/cart-context"
+import { LanguageProvider } from "@/lib/language-context"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { MetaPixelProvider } from "@/components/meta-pixel-provider"
@@ -133,13 +134,15 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ScrollToTop />
         <Suspense fallback={null}>
-          <MetaPixelProvider>
-            <CartProvider>
-              <Header />
-              <main className="min-h-screen pt-16 lg:pt-20">{children}</main>
-              <Footer />
-            </CartProvider>
-          </MetaPixelProvider>
+          <LanguageProvider>
+            <MetaPixelProvider>
+              <CartProvider>
+                <Header />
+                <main className="min-h-screen pt-16 lg:pt-20">{children}</main>
+                <Footer />
+              </CartProvider>
+            </MetaPixelProvider>
+          </LanguageProvider>
         </Suspense>
         <Toaster />
         <Analytics />
