@@ -29,6 +29,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID || "992482810135395"
+  const pixelId2 = "1309753271055484" // Second Meta Pixel
   
   return (
     <html lang="fr">
@@ -36,7 +37,7 @@ export default function RootLayout({
         {/* Facebook Domain Verification */}
         <meta name="facebook-domain-verification" content="ihv7koj9hajrwhdhclgubwhbfk6c22" />
 
-        {/* Meta Pixel Code - ID from environment variable */}
+        {/* Meta Pixel Code - Both Pixels initialized together */}
         <Script id="meta-pixel-init" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -48,15 +49,27 @@ export default function RootLayout({
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
             fbq('init', '${pixelId}');
+            fbq('init', '${pixelId2}');
             fbq('track', 'PageView');
           `}
         </Script>
+        {/* Noscript fallback for Pixel 1 */}
         <noscript>
           <img
             height="1"
             width="1"
             style={{ display: "none" }}
             src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}
+            alt=""
+          />
+        </noscript>
+        {/* Noscript fallback for Pixel 2 */}
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${pixelId2}&ev=PageView&noscript=1`}
             alt=""
           />
         </noscript>
