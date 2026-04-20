@@ -28,7 +28,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID || "1139772708143683"
+  const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID || "992482810135395"
   
   return (
     <html lang="fr">
@@ -37,7 +37,7 @@ export default function RootLayout({
         <meta name="facebook-domain-verification" content="0flnhzhj5a1hojebzmwgiiplk1mj8i" />
 
         {/* Meta Pixel Code - ID from environment variable */}
-        <Script id="meta-pixel-init" strategy="beforeInteractive">
+        <Script id="meta-pixel-init" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
