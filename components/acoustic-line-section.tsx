@@ -1,4 +1,7 @@
+"use client"
+
 import Image from "next/image"
+import { useLanguage } from "@/lib/language-context"
 
 const CONTENT = {
   en: {
@@ -47,13 +50,9 @@ const CONTENT = {
   },
 }
 
-interface AcousticLineSectionProps {
-  isFrenchVersion?: boolean
-}
-
-export function AcousticLineSection({ isFrenchVersion = false }: AcousticLineSectionProps) {
-  const lang = isFrenchVersion ? "fr" : "en"
-  const t = CONTENT[lang]
+export function AcousticLineSection() {
+  const { language } = useLanguage()
+  const t = CONTENT[language]
 
   return (
     <section className="mt-16 sm:mt-24">

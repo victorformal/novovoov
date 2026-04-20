@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { Plus, Minus, Package } from "lucide-react"
 import { useCart } from "@/lib/cart-context"
+import { useLanguage } from "@/lib/language-context"
 
 const SAMPLES = [
   {
@@ -18,7 +19,7 @@ const SAMPLES = [
   },
   {
     id: "freijo",
-    name: { en: "Freijó", fr: "Freijó" },
+    name: { en: "Freijo", fr: "Freijo" },
     image: "/images/samples/freijo.jpg",
   },
   {
@@ -67,8 +68,8 @@ const LABELS = {
     clickToAdd: "Cliquez sur les echantillons pour les ajouter.",
     selected: (n: number) => `${n} ${n <= 1 ? "selectionne" : "selectionnes"}`,
     total: "Total",
-    shipping: "Livraison estimée",
-    shippingDays: "5 à 8 jours ouvrables",
+    shipping: "Livraison estimee",
+    shippingDays: "5 a 8 jours ouvrables",
     freeLabel: "Livraison gratuite",
     addToCart: "Ajouter au panier",
     remove: (name: string) => `Retirer ${name}`,
@@ -76,17 +77,13 @@ const LABELS = {
   },
 }
 
-interface SamplesSectionProps {
-  isFrenchVersion?: boolean
-}
-
-export function SamplesSection({ isFrenchVersion = false }: SamplesSectionProps) {
+export function SamplesSection() {
   const [selected, setSelected] = useState<string[]>([])
   const { addItem } = useCart()
-  const lang = isFrenchVersion ? "fr" : "en"
-  const t = LABELS[lang]
-  const price = PRICE[lang]
-  const currency = CURRENCY[lang]
+  const { language } = useLanguage()
+  const t = LABELS[language]
+  const price = PRICE[language]
+  const currency = CURRENCY[language]
   const total = selected.length * price
 
   const toggle = (id: string) => {
@@ -102,11 +99,11 @@ export function SamplesSection({ isFrenchVersion = false }: SamplesSectionProps)
       const sampleProduct = {
         id: `sample-${id}`,
         slug: `sample-${id}`,
-        name: `Sample - ${sample.name[lang]}`,
-        description: sample.name[lang],
+        name: `Sample - ${sample.name[language]}`,
+        description: sample.name[language],
         longDescription: "",
         price: price,
-        currency: isFrenchVersion ? "EUR" : "GBP",
+        currency: language === "fr" ? "EUR" : "GBP",
         category: "samples",
         images: [sample.image],
         features: [],
@@ -149,7 +146,7 @@ export function SamplesSection({ isFrenchVersion = false }: SamplesSectionProps)
                     >
                       <Image
                         src={sample.image}
-                        alt={sample.name[lang]}
+                        alt={sample.name[language]}
                         width={56}
                         height={56}
                         className="w-full h-full object-cover"
@@ -178,7 +175,7 @@ export function SamplesSection({ isFrenchVersion = false }: SamplesSectionProps)
           <div className="space-y-2 flex-1">
             {SAMPLES.map((sample) => {
               const isSelected = selected.includes(sample.id)
-              const name = sample.name[lang]
+              const name = sample.name[language]
               return (
                 <div
                   key={sample.id}

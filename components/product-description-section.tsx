@@ -3,9 +3,33 @@
 import { useRef } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useLanguage } from "@/lib/language-context"
+
+const CONTENT = {
+  en: {
+    title: "Product Gallery",
+    features: [
+      { title: "NRC 0.80", desc: "Excellent Sound Absorption" },
+      { title: "E1 Certified", desc: "Low Formaldehyde Emission" },
+      { title: "Easy Install", desc: "DIY Friendly Setup" },
+      { title: "SGS Certified", desc: "Safe & Eco-Friendly" },
+    ],
+  },
+  fr: {
+    title: "Galerie Produit",
+    features: [
+      { title: "NRC 0.80", desc: "Excellente Absorption Sonore" },
+      { title: "Certifie E1", desc: "Faible Emission de Formaldehyde" },
+      { title: "Installation Facile", desc: "Compatible Bricolage" },
+      { title: "Certifie SGS", desc: "Sur et Ecologique" },
+    ],
+  },
+}
 
 export function ProductDescriptionSection() {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const { language } = useLanguage()
+  const t = CONTENT[language]
 
   const flexibleImages = [
     { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/flexible01-4OcwUWDlOibpyftWOQHwyW3JJ7BHKW.jpg", alt: "Flexible Acoustic Panel - Product Pack" },
@@ -30,7 +54,7 @@ export function ProductDescriptionSection() {
 
   return (
     <div className="mt-16 border-t border-border pt-16 overflow-hidden">
-      <h2 className="mb-12 text-center font-serif text-2xl sm:text-3xl px-2">Product Gallery</h2>
+      <h2 className="mb-12 text-center font-serif text-2xl sm:text-3xl px-2">{t.title}</h2>
 
       {/* Flexible Images Carousel with Scroll */}
       <div className="mb-16">
@@ -80,22 +104,12 @@ export function ProductDescriptionSection() {
 
       {/* Key Features Summary */}
       <div className="mt-12 grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg bg-secondary/50 p-4 sm:p-6 text-center">
-          <h4 className="font-semibold text-sm sm:text-base">NRC 0.80</h4>
-          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">Excellent Sound Absorption</p>
-        </div>
-        <div className="rounded-lg bg-secondary/50 p-4 sm:p-6 text-center">
-          <h4 className="font-semibold text-sm sm:text-base">E1 Certified</h4>
-          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">Low Formaldehyde Emission</p>
-        </div>
-        <div className="rounded-lg bg-secondary/50 p-4 sm:p-6 text-center">
-          <h4 className="font-semibold text-sm sm:text-base">Easy Install</h4>
-          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">DIY Friendly Setup</p>
-        </div>
-        <div className="rounded-lg bg-secondary/50 p-4 sm:p-6 text-center">
-          <h4 className="font-semibold text-sm sm:text-base">SGS Certified</h4>
-          <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">Safe & Eco-Friendly</p>
-        </div>
+        {t.features.map((feature, index) => (
+          <div key={index} className="rounded-lg bg-secondary/50 p-4 sm:p-6 text-center">
+            <h4 className="font-semibold text-sm sm:text-base">{feature.title}</h4>
+            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">{feature.desc}</p>
+          </div>
+        ))}
       </div>
     </div>
   )
