@@ -30,6 +30,7 @@ export default function RootLayout({
 }>) {
   const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID
   const pixelId2 = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID_2
+  const pixelId3 = "1440709523610900" // Third Meta Pixel
   
   return (
     <html lang="fr">
@@ -50,6 +51,7 @@ export default function RootLayout({
             'https://connect.facebook.net/en_US/fbevents.js');
             ${pixelId ? `fbq('init', '${pixelId}');` : ''}
             ${pixelId2 ? `fbq('init', '${pixelId2}');` : ''}
+            fbq('init', '${pixelId3}');
             fbq('track', 'PageView');
           `}
         </Script>
@@ -77,6 +79,16 @@ export default function RootLayout({
             />
           </noscript>
         )}
+        {/* Noscript fallback for Pixel 3 */}
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${pixelId3}&ev=PageView&noscript=1`}
+            alt=""
+          />
+        </noscript>
 
         {/* Google Analytics */}
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-E72RJSKTZ3" strategy="afterInteractive" />
