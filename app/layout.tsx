@@ -28,9 +28,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID || "992482810135395"
-  const pixelId2 = "1309753271055484" // Second Meta Pixel
-  const pixelId3 = "1440709523610900" // Third Meta Pixel
+  const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID
+  const pixelId2 = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID_2
   
   return (
     <html lang="fr">
@@ -49,42 +48,35 @@ export default function RootLayout({
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${pixelId}');
-            fbq('init', '${pixelId2}');
-            fbq('init', '${pixelId3}');
+            ${pixelId ? `fbq('init', '${pixelId}');` : ''}
+            ${pixelId2 ? `fbq('init', '${pixelId2}');` : ''}
             fbq('track', 'PageView');
           `}
         </Script>
         {/* Noscript fallback for Pixel 1 */}
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}
-            alt=""
-          />
-        </noscript>
+        {pixelId && (
+          <noscript>
+            <img
+              height="1"
+              width="1"
+              style={{ display: "none" }}
+              src={`https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`}
+              alt=""
+            />
+          </noscript>
+        )}
         {/* Noscript fallback for Pixel 2 */}
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src={`https://www.facebook.com/tr?id=${pixelId2}&ev=PageView&noscript=1`}
-            alt=""
-          />
-        </noscript>
-        {/* Noscript fallback for Pixel 3 */}
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src={`https://www.facebook.com/tr?id=${pixelId3}&ev=PageView&noscript=1`}
-            alt=""
-          />
-        </noscript>
+        {pixelId2 && (
+          <noscript>
+            <img
+              height="1"
+              width="1"
+              style={{ display: "none" }}
+              src={`https://www.facebook.com/tr?id=${pixelId2}&ev=PageView&noscript=1`}
+              alt=""
+            />
+          </noscript>
+        )}
 
         {/* Google Analytics */}
         <Script async src="https://www.googletagmanager.com/gtag/js?id=G-E72RJSKTZ3" strategy="afterInteractive" />
