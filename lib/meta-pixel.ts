@@ -3,6 +3,7 @@
 
 export const META_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID || "992482810135395"
 export const META_PIXEL_ID_2 = "1309753271055484" // Second Meta Pixel
+export const META_PIXEL_ID_3 = "1440709523610900" // Third Meta Pixel
 
 // Declare fbq type for TypeScript
 declare global {
