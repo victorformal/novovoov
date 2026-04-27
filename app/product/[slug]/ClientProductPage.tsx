@@ -33,7 +33,7 @@ import { StockUrgencyBarFr } from "@/components/stock-urgency-bar-fr"
 import { SocialProofInlineFr } from "@/components/social-proof-inline-fr"
 import { RatingBreakdownFr } from "@/components/rating-breakdown-fr"
 import { SalesNotificationToast } from "@/components/sales-notification-toast"
-import { BonusModalFr } from "@/components/bonus-modal-fr"
+
 import { BonusProgressBar } from "@/components/bonus-progress-bar"
 import { VideoGalleryFr } from "@/components/video-gallery-fr"
 // UK components
@@ -43,7 +43,7 @@ import { FAQSectionUK } from "@/components/faq-section-uk"
 import { StockUrgencyBarUK } from "@/components/stock-urgency-bar-uk"
 import { SocialProofInlineUK } from "@/components/social-proof-inline-uk"
 import { RatingBreakdownUK } from "@/components/rating-breakdown-uk"
-import { BonusModalUK } from "@/components/bonus-modal-uk"
+
 import { VideoGalleryUK } from "@/components/video-gallery-uk"
 
 interface ClientProductPageProps {
@@ -137,9 +137,6 @@ export default function ClientProductPage({
   // FR Order Summary state — shows after "Commander Maintenant" is clicked
   const [frOrderData, setFrOrderData] = useState<{ qty: number; price: number; totalPrice: number; ledFree: boolean } | null>(null)
   
-  // FR: Bonus modal state
-  const [showBonusModal, setShowBonusModal] = useState(false)
-
   // FR: callback when item is added to cart — show toast + scroll to Acoustic Line Section
   const handleFrAddedToCart = (orderData: { qty: number; price: number; totalPrice: number; ledFree: boolean }) => {
     setFrOrderData(orderData)
@@ -175,22 +172,9 @@ export default function ClientProductPage({
     })
   }
 
-  // FR: Handle "Finaliser Ma Commande" button click - show bonus modal
+  // FR: Handle "Finaliser Ma Commande" button click - go directly to checkout
   const handleFinalizeOrder = () => {
-    setShowBonusModal(true)
-  }
-
-  const handleAcceptBonus = () => {
-    // Save bonus data
-    sessionStorage.setItem("checkout_bonus_fr", JSON.stringify({
-      bonusPanels: 5,
-      cleanerIncluded: true,
-      technicianIncluded: true,
-      installationCode: "AXB8930M9",
-      bonusValue: 127.00
-    }))
-    
-    // Also save the order data so checkout-fr has access to it
+    // Save the order data so checkout-fr has access to it
     if (frOrderData) {
       const orderData = {
         productId: product.id,
@@ -204,30 +188,6 @@ export default function ClientProductPage({
       }
       sessionStorage.setItem("checkout_order_fr", JSON.stringify(orderData))
     }
-    
-    setShowBonusModal(false)
-    router.push("/checkout-fr")
-  }
-
-  const handleDeclineBonus = () => {
-    sessionStorage.removeItem("checkout_bonus_fr")
-    
-    // Also save the order data so checkout-fr has access to it
-    if (frOrderData) {
-      const orderData = {
-        productId: product.id,
-        name: product.name,
-        price: frOrderData.price,
-        totalPrice: frOrderData.totalPrice,
-        quantity: frOrderData.qty,
-        image: product.images?.[0] || product.image || "",
-        currency: "EUR",
-        ledFree: frOrderData.ledFree,
-      }
-      sessionStorage.setItem("checkout_order_fr", JSON.stringify(orderData))
-    }
-    
-    setShowBonusModal(false)
     router.push("/checkout-fr")
   }
 
@@ -240,17 +200,9 @@ export default function ClientProductPage({
     })
   }
 
-  const handleUKAcceptBonus = () => {
-    // Save bonus data
-    sessionStorage.setItem("checkout_bonus_uk", JSON.stringify({
-      bonusPanels: 5,
-      cleanerIncluded: true,
-      technicianIncluded: true,
-      installationCode: "AXB8930M9",
-      bonusValue: 107.00
-    }))
-    
-    // Also save the order data so checkout-uk has access to it
+  // UK: Handle "Complete My Order" button click - go directly to checkout
+  const handleUKFinalizeOrder = () => {
+    // Save the order data so checkout-uk has access to it
     if (frOrderData) {
       const orderData = {
         productId: product.id,
@@ -264,30 +216,6 @@ export default function ClientProductPage({
       }
       sessionStorage.setItem("checkout_order_uk", JSON.stringify(orderData))
     }
-    
-    setShowBonusModal(false)
-    router.push("/checkout-uk")
-  }
-
-  const handleUKDeclineBonus = () => {
-    sessionStorage.removeItem("checkout_bonus_uk")
-    
-    // Also save the order data so checkout-uk has access to it
-    if (frOrderData) {
-      const orderData = {
-        productId: product.id,
-        name: product.name,
-        price: frOrderData.price,
-        totalPrice: frOrderData.totalPrice,
-        quantity: frOrderData.qty,
-        image: product.images?.[0] || product.image || "",
-        currency: "GBP",
-        ledFree: frOrderData.ledFree,
-      }
-      sessionStorage.setItem("checkout_order_uk", JSON.stringify(orderData))
-    }
-    
-    setShowBonusModal(false)
     router.push("/checkout-uk")
   }
 
@@ -952,7 +880,7 @@ export default function ClientProductPage({
             {/* CTA Button */}
             <button
               type="button"
-              onClick={() => setShowBonusModal(true)}
+              onClick={handleUKFinalizeOrder}
               className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold text-lg py-4 px-8 transition-colors duration-200 shadow-lg"
             >
               <Shield className="h-5 w-5 flex-shrink-0" />
@@ -1055,25 +983,7 @@ export default function ClientProductPage({
       {isFrenchVersion && isFlexibleAcousticPanel && <StickyCartBarFr />}
       {isUKVersion && isFlexibleAcousticPanel && <StickyCartBarUK />}
 
-      {/* Bonus Modal - FR only */}
-      {isFrenchVersion && (
-        <BonusModalFr
-          isOpen={showBonusModal}
-          onClose={() => setShowBonusModal(false)}
-          onAcceptBonus={handleAcceptBonus}
-          onDeclineBonus={handleDeclineBonus}
-        />
-      )}
-
-      {/* Bonus Modal - UK only */}
-      {isUKVersion && (
-        <BonusModalUK
-          isOpen={showBonusModal}
-          onClose={() => setShowBonusModal(false)}
-          onAcceptBonus={handleUKAcceptBonus}
-          onDeclineBonus={handleUKDeclineBonus}
-        />
-      )}
+      
     </div>
   )
 }

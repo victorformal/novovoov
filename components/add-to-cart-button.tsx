@@ -10,8 +10,7 @@ import { trackAddToCart, generateEventId } from "@/lib/meta-pixel"
 import { trackAddToCart as trackTikTokAddToCart } from "@/lib/tiktok-events"
 import { getFbpFbc } from "@/lib/fbp-fbc"
 import { getStoredUTMs } from "@/lib/utm-client"
-import { BonusModalFr } from "@/components/bonus-modal-fr"
-import { BonusModalUK } from "@/components/bonus-modal-uk"
+
 
 interface AddToCartButtonProps {
   product: Product
@@ -63,9 +62,7 @@ export function AddToCartButton({ product, variant = "default", className, isFre
   // FR: custom quantity selector
   const [customQuantityFr, setCustomQuantityFr] = useState(5)
   const [useFrCustomQty, setUseFrCustomQty] = useState(false)
-  // FR: Bonus modal state
-  const [showBonusModal, setShowBonusModal] = useState(false)
-  const [pendingOrderData, setPendingOrderData] = useState<{ qty: number; price: number; totalPrice: number; ledFree: boolean } | null>(null)
+  
   // EN Flexible Acoustic: default to 4 panels option (index 2)
   const [selectedQtyOptionEn, setSelectedQtyOptionEn] = useState(enQuantities[2])
   // UK Flexible Acoustic: default to 4 panels option (index 2)
@@ -219,14 +216,8 @@ export function AddToCartButton({ product, variant = "default", className, isFre
         return // Don't redirect — let parent handle scroll to Order Summary
       }
 
-      // FR: Show bonus modal instead of redirecting directly
-      setPendingOrderData({
-        qty: finalQty,
-        price: finalUnitPrice,
-        totalPrice: finalTotalPrice,
-        ledFree: finalLedFree,
-      })
-      setShowBonusModal(true)
+      // FR: Go directly to checkout (no bonus modal)
+      router.push("/checkout-fr")
       return
     }
 
@@ -265,14 +256,8 @@ export function AddToCartButton({ product, variant = "default", className, isFre
         return // Don't redirect — let parent handle scroll to Order Summary
       }
 
-      // UK: Show bonus modal instead of redirecting directly
-      setPendingOrderData({
-        qty: finalQty,
-        price: finalUnitPrice,
-        totalPrice: finalTotalPrice,
-        ledFree: finalLedFree,
-      })
-      setShowBonusModal(true)
+      // UK: Go directly to checkout (no bonus modal)
+      router.push("/checkout-uk")
       return
     }
 
@@ -307,34 +292,7 @@ export function AddToCartButton({ product, variant = "default", className, isFre
       handleBuyNow(customQuantityFr, customTotalFr)
     }
 
-    const handleAcceptBonus = () => {
-      // Store bonus info in sessionStorage
-      sessionStorage.setItem("checkout_bonus_fr", JSON.stringify({
-        bonusPanels: 5,
-        cleanerIncluded: true,
-        technicianIncluded: true,
-        installationCode: "AXB8930M9",
-        bonusValue: 127.00
-      }))
-      setShowBonusModal(false)
-      router.push("/checkout-fr")
-    }
-
-    const handleDeclineBonus = () => {
-      // Clear any bonus info
-      sessionStorage.removeItem("checkout_bonus_fr")
-      setShowBonusModal(false)
-      router.push("/checkout-fr")
-    }
-
     return (
-      <>
-      <BonusModalFr
-        isOpen={showBonusModal}
-        onClose={() => setShowBonusModal(false)}
-        onAcceptBonus={handleAcceptBonus}
-        onDeclineBonus={handleDeclineBonus}
-      />
       <div className="flex flex-col gap-4 w-full items-center">
         {/* Simple quantity selector */}
         <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
@@ -369,38 +327,12 @@ export function AddToCartButton({ product, variant = "default", className, isFre
           Buy Now - {customTotalFr.toFixed(2).replace(".", ",")} EUR
         </button>
       </div>
-      </>
     )
   }
 
   // UK Flexible Acoustic Panel version: upsell quantity selector + orange CTA button
   if (isUKVersion) {
-    const handleUKAcceptBonus = () => {
-      sessionStorage.setItem("checkout_bonus_uk", JSON.stringify({
-        bonusPanels: 5,
-        cleanerIncluded: true,
-        technicianIncluded: true,
-        installationCode: "AXB8930M9",
-        bonusValue: 107.00
-      }))
-      setShowBonusModal(false)
-      router.push("/checkout-uk")
-    }
-
-    const handleUKDeclineBonus = () => {
-      sessionStorage.removeItem("checkout_bonus_uk")
-      setShowBonusModal(false)
-      router.push("/checkout-uk")
-    }
-
     return (
-      <>
-      <BonusModalUK
-        isOpen={showBonusModal}
-        onClose={() => setShowBonusModal(false)}
-        onAcceptBonus={handleUKAcceptBonus}
-        onDeclineBonus={handleUKDeclineBonus}
-      />
       <div className="flex flex-col gap-3 w-full">
         {/* Quantity upsell cards */}
         <div className="space-y-2">
@@ -462,7 +394,6 @@ export function AddToCartButton({ product, variant = "default", className, isFre
           100% Secure Payment &nbsp;|&nbsp; Free Shipping Over £80
         </p>
       </div>
-      </>
     )
   }
 
