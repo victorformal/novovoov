@@ -8,22 +8,18 @@ const VIDEOS = [
   {
     src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Akupanel%20240%20_%20E%CC%81liminez%20la%20re%CC%81verbe%CC%81ration%20-%20WoodUpp-2-eKZtlhcQPAKFYRd6PK8pXZ3i0Cv4XO.mp4",
     label: "Customer",
-    poster: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LED0101-NcQN4b3GARfX7EQhQSIcnMbQB9NsFa.jpg",
   },
   {
     src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Akupanel%20240%20_%20E%CC%81liminez%20la%20re%CC%81verbe%CC%81ration%20-%20WoodUpp-3-3C4xW1cYlltiGsbtVtdVGi7eLGtkRG.mp4",
     label: "Customer",
-    poster: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LED0202-FgYEc2VLFBKleJV7PYlgETikXoR8mG.jpg",
   },
   {
     src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Akupanel%20240%20_%20E%CC%81liminez%20la%20re%CC%81verbe%CC%81ration%20-%20WoodUpp-4-mSEg1welpEmB59DXWCjwj7MkqFWrJS.mp4",
     label: "Customer",
-    poster: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LED0303-gogSHAtk3fgrlc95hSLuauXIeSc1We.jpg",
   },
   {
     src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Akupanel%20240%20_%20E%CC%81liminez%20la%20re%CC%81verbe%CC%81ration%20-%20WoodUpp-6-0qD7LaI2eTiaRCEsNB9bHJSgXqWdLV.mp4",
     label: "Customer",
-    poster: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LED0333-aAgFPx9MLEjZ1qUmRjKyg0TTMx5AlI.jpg",
   },
 ]
 
@@ -133,15 +129,6 @@ export function VideoGalleryUK() {
             }}
             onClick={() => toggleVideo(index)}
           >
-            {/* Thumbnail image - always visible until video plays */}
-            <img
-              src={video.poster}
-              alt={`Video ${index + 1} thumbnail`}
-              className={cn(
-                "absolute inset-0 w-full h-full object-cover transition-opacity duration-300 z-[1]",
-                activeIndex === index ? "opacity-0" : "opacity-100"
-              )}
-            />
             <video
               ref={(el) => { videoRefs.current[index] = el }}
               src={video.src}
@@ -153,12 +140,12 @@ export function VideoGalleryUK() {
             />
 
             {/* Gradient overlay */}
-            <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black/55 to-transparent rounded-b-2xl lg:rounded-b-[20px] pointer-events-none z-[2]" />
+            <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black/55 to-transparent rounded-b-2xl lg:rounded-b-[20px] pointer-events-none" />
 
             {/* Play button */}
             <div
               className={cn(
-                "absolute inset-0 flex items-center justify-center transition-opacity duration-200 z-[3]",
+                "absolute inset-0 flex items-center justify-center transition-opacity duration-200",
                 activeIndex === index ? "opacity-0" : "opacity-100"
               )}
             >
@@ -168,7 +155,7 @@ export function VideoGalleryUK() {
             </div>
 
             {/* Badge */}
-            <span className="absolute bottom-3 left-3 bg-accent text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full z-[3]">
+            <span className="absolute bottom-3 left-3 bg-accent text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
               {video.label}
             </span>
           </div>
