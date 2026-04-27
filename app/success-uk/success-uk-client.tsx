@@ -78,7 +78,9 @@ export default function SuccessUKClient({ sessionId }: { sessionId: string | nul
           // Dispara especificamente para o pixel UK 1440709523610900
           window.fbq("trackSingle", "1440709523610900", "Purchase", purchaseData, { eventID: `${purchaseEventId}_uk` })
           
-          console.log("[v0] Meta Pixel Purchase disparado para pixel 1440709523610900", { value: sessionValue, currency: sessionCurrency })
+          // Dispara também para os outros pixels EUR
+          window.fbq("trackSingle", "992482810135395", "Purchase", purchaseData, { eventID: `${purchaseEventId}_eur` })
+          window.fbq("trackSingle", "1309753271055484", "Purchase", purchaseData, { eventID: `${purchaseEventId}_eur2` })
         }
 
         // 4) TikTok Purchase
