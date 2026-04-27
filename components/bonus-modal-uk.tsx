@@ -4,13 +4,25 @@ import { useState, useEffect } from "react"
 import { X, Gift, Clock, Check } from "lucide-react"
 
 interface BonusModalUKProps {
-  onAccept: () => void
-  onDecline: () => void
+  isOpen: boolean
+  onClose: () => void
+  onAcceptBonus: () => void
+  onDeclineBonus: () => void
 }
 
-export function BonusModalUK({ onAccept, onDecline }: BonusModalUKProps) {
+export function BonusModalUK({ isOpen, onClose, onAcceptBonus, onDeclineBonus }: BonusModalUKProps) {
   const [timeLeft, setTimeLeft] = useState(15 * 60) // 15 minutes in seconds
   const [bonusActivated, setBonusActivated] = useState(false)
+  
+  // Reset state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setBonusActivated(false)
+      setTimeLeft(15 * 60)
+    }
+  }, [isOpen])
+  
+  if (!isOpen) return null
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -36,7 +48,7 @@ export function BonusModalUK({ onAccept, onDecline }: BonusModalUKProps) {
     setBonusActivated(true)
     // Wait a moment to show confirmation, then proceed
     setTimeout(() => {
-      onAccept()
+      onAcceptBonus()
     }, 1500)
   }
 
@@ -45,7 +57,7 @@ export function BonusModalUK({ onAccept, onDecline }: BonusModalUKProps) {
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onDecline}
+        onClick={onClose}
       />
       
       {/* Modal */}
@@ -63,7 +75,7 @@ export function BonusModalUK({ onAccept, onDecline }: BonusModalUKProps) {
 
         {/* Close button */}
         <button
-          onClick={onDecline}
+          onClick={onClose}
           className="absolute top-3 right-3 text-white/80 hover:text-white transition-colors"
         >
           <X className="w-5 h-5" />
@@ -79,49 +91,54 @@ export function BonusModalUK({ onAccept, onDecline }: BonusModalUKProps) {
             </p>
           </div>
 
-          <p className="text-sm font-semibold text-[#3a2800] mb-4">
-            COMPLETE NOW AND RECEIVE FREE:
-          </p>
+          {/* Pre-activation content */}
+          {!bonusActivated && (
+            <>
+              <p className="text-sm font-semibold text-[#3a2800] mb-4">
+                COMPLETE NOW AND RECEIVE FREE:
+              </p>
 
-          {/* Bonus items */}
-          <div className="space-y-3 mb-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-3 h-3 text-white" />
+              {/* Bonus items */}
+              <div className="space-y-3 mb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-sm text-[#3a2800]">5 Bonus Acoustic Panels</span>
+                  </div>
+                  <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">FREE</span>
                 </div>
-                <span className="text-sm text-[#3a2800]">5 Bonus Acoustic Panels</span>
-              </div>
-              <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">FREE</span>
-            </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-3 h-3 text-white" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-sm text-[#3a2800]">Wall Cleaner Spray</span>
+                  </div>
+                  <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">FREE</span>
                 </div>
-                <span className="text-sm text-[#3a2800]">Wall Cleaner Spray</span>
-              </div>
-              <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">FREE</span>
-            </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-3 h-3 text-white" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-sm text-[#3a2800]">Installation technician</span>
+                  </div>
+                  <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">FREE</span>
                 </div>
-                <span className="text-sm text-[#3a2800]">Installation technician</span>
               </div>
-              <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded">FREE</span>
-            </div>
-          </div>
 
-          {/* Value note */}
-          <div className="border-l-4 border-[#e8a020] bg-[#fff3d0] px-3 py-2 rounded-r-lg mb-5">
-            <p className="text-xs text-[#7a4200]">
-              Gift value: <strong>£107.00</strong> — Included only with this order
-            </p>
-          </div>
+              {/* Value note */}
+              <div className="border-l-4 border-[#e8a020] bg-[#fff3d0] px-3 py-2 rounded-r-lg mb-5">
+                <p className="text-xs text-[#7a4200]">
+                  Gift value: <strong>£107.00</strong> — Included only with this order
+                </p>
+              </div>
+            </>
+          )}
 
           {/* Bonus activated confirmation */}
           {bonusActivated && (
@@ -166,7 +183,7 @@ export function BonusModalUK({ onAccept, onDecline }: BonusModalUKProps) {
           {/* Decline link */}
           {!bonusActivated && (
             <button
-              onClick={onDecline}
+              onClick={onDeclineBonus}
               className="w-full text-center text-xs text-[#7a4200]/60 hover:text-[#7a4200] underline transition-colors"
             >
               No thanks, continue without bonus
