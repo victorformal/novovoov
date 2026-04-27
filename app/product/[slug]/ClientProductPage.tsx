@@ -33,9 +33,18 @@ import { StockUrgencyBarFr } from "@/components/stock-urgency-bar-fr"
 import { SocialProofInlineFr } from "@/components/social-proof-inline-fr"
 import { RatingBreakdownFr } from "@/components/rating-breakdown-fr"
 import { SalesNotificationToast } from "@/components/sales-notification-toast"
-import { BonusModalFr } from "@/components/bonus-modal-fr"
+
 import { BonusProgressBar } from "@/components/bonus-progress-bar"
 import { VideoGalleryFr } from "@/components/video-gallery-fr"
+// UK components
+import { PanelCalculatorUK } from "@/components/panel-calculator-uk"
+import { StickyCartBarUK } from "@/components/sticky-cart-bar-uk"
+import { FAQSectionUK } from "@/components/faq-section-uk"
+import { StockUrgencyBarUK } from "@/components/stock-urgency-bar-uk"
+import { SocialProofInlineUK } from "@/components/social-proof-inline-uk"
+import { RatingBreakdownUK } from "@/components/rating-breakdown-uk"
+
+import { VideoGalleryUK } from "@/components/video-gallery-uk"
 
 interface ClientProductPageProps {
   product: any
@@ -48,6 +57,7 @@ interface ClientProductPageProps {
   isRecessedLedStrip?: boolean
   discountPercent: number
   isFrenchVersion?: boolean
+  isUKVersion?: boolean
 }
 
 // French translations for UI text
@@ -112,8 +122,12 @@ export default function ClientProductPage({
   isRecessedLedStrip = false,
   discountPercent,
   isFrenchVersion = false,
+  isUKVersion = false,
 }: ClientProductPageProps) {
   const t = isFrenchVersion ? frenchTranslations : englishTranslations
+  
+  // Determine currency symbol based on version
+  const currencySymbol = isFrenchVersion ? "€" : "£"
   const { addItem, totalItems } = useCart()
   const { opacity, isVisible } = useScrollVisibility()
   const [showStickyCta, setShowStickyCta] = useState(false)
@@ -123,9 +137,6 @@ export default function ClientProductPage({
   // FR Order Summary state — shows after "Commander Maintenant" is clicked
   const [frOrderData, setFrOrderData] = useState<{ qty: number; price: number; totalPrice: number; ledFree: boolean } | null>(null)
   
-  // FR: Bonus modal state
-  const [showBonusModal, setShowBonusModal] = useState(false)
-
   // FR: callback when item is added to cart — show toast + scroll to Acoustic Line Section
   const handleFrAddedToCart = (orderData: { qty: number; price: number; totalPrice: number; ledFree: boolean }) => {
     setFrOrderData(orderData)
@@ -135,9 +146,9 @@ export default function ClientProductPage({
     })
   }
   
-  // Sticky CTA: show when main CTA button scrolls out of view (for FR or EN Flexible Acoustic)
+  // Sticky CTA: show when main CTA button scrolls out of view (for FR, UK or EN Flexible Acoustic)
   useEffect(() => {
-    if (!isFrenchVersion && !isFlexibleAcousticPanel) return
+    if (!isFrenchVersion && !isUKVersion && !isFlexibleAcousticPanel) return
     const handleScroll = () => {
       const btn = document.querySelector("[data-add-to-cart]") as HTMLElement | null
       if (btn) {
@@ -147,7 +158,7 @@ export default function ClientProductPage({
     }
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [isFrenchVersion, isFlexibleAcousticPanel])
+  }, [isFrenchVersion, isUKVersion, isFlexibleAcousticPanel])
 
   const handleAddBothToCart = () => {
     frequentlyBoughtTogether.forEach((bundleProduct) => {
@@ -161,39 +172,75 @@ export default function ClientProductPage({
     })
   }
 
-  // FR: Handle "Finaliser Ma Commande" button click - show bonus modal
+  // FR: Handle "Finaliser Ma Commande" button click - go directly to checkout
   const handleFinalizeOrder = () => {
-    setShowBonusModal(true)
-  }
-
-  const handleAcceptBonus = () => {
-    sessionStorage.setItem("checkout_bonus_fr", JSON.stringify({
-      bonusPanels: 5,
-      cleanerIncluded: true,
-      technicianIncluded: true,
-      installationCode: "AXB8930M9",
-      bonusValue: 127.00
-    }))
-    setShowBonusModal(false)
+    // Save the order data so checkout-fr has access to it
+    if (frOrderData) {
+      const orderData = {
+        productId: product.id,
+        name: product.name,
+        price: frOrderData.price,
+        totalPrice: frOrderData.totalPrice,
+        quantity: frOrderData.qty,
+        image: product.images?.[0] || product.image || "",
+        currency: "EUR",
+        ledFree: frOrderData.ledFree,
+      }
+      sessionStorage.setItem("checkout_order_fr", JSON.stringify(orderData))
+    }
     router.push("/checkout-fr")
   }
 
-  const handleDeclineBonus = () => {
-    sessionStorage.removeItem("checkout_bonus_fr")
-    setShowBonusModal(false)
-    router.push("/checkout-fr")
+  // UK handlers
+  const handleUKAddedToCart = (orderData: { qty: number; price: number; totalPrice: number; ledFree: boolean }) => {
+    setFrOrderData(orderData) // Reusing FR state for UK
+    toast({
+      title: "Product added!",
+      description: `${orderData.qty} panel(s) added to cart`,
+    })
+  }
+
+  // UK: Handle "Complete My Order" button click - go directly to checkout
+  const handleUKFinalizeOrder = () => {
+    // Save the order data so checkout-uk has access to it
+    if (frOrderData) {
+      const orderData = {
+        productId: product.id,
+        name: product.name,
+        price: frOrderData.price,
+        totalPrice: frOrderData.totalPrice,
+        quantity: frOrderData.qty,
+        image: product.images?.[0] || product.image || "",
+        currency: "GBP",
+        ledFree: frOrderData.ledFree,
+      }
+      sessionStorage.setItem("checkout_order_uk", JSON.stringify(orderData))
+    }
+    router.push("/checkout-uk")
   }
 
   return (
     <div className="py-8 lg:py-12 overflow-x-hidden max-w-full w-full box-border relative">
       <ViewContentTracker product={product} />
 
-      {/* Sales notification toast — FR only */}
-      {isFrenchVersion && <SalesNotificationToast />}
+      {/* Sales notification toast — FR and UK */}
+      {(isFrenchVersion || isUKVersion) && <SalesNotificationToast />}
 
       {/* Exit intent popup — FR only */}
       {isFrenchVersion && (
         <ExitIntentPopupFr
+          onConfirm={() => {
+            const btn = document.querySelector("[data-add-to-cart]") as HTMLButtonElement
+            if (btn) {
+              btn.scrollIntoView({ behavior: "smooth" })
+            }
+          }}
+        />
+      )}
+
+      {/* Exit intent popup — UK only */}
+      {isUKVersion && (
+        <ExitIntentPopup
           onConfirm={() => {
             const btn = document.querySelector("[data-add-to-cart]") as HTMLButtonElement
             if (btn) {
@@ -253,6 +300,13 @@ export default function ClientProductPage({
               </p>
             )}
 
+            {/* UK: Benefit subheadline */}
+            {isUKVersion && isFlexibleAcousticPanel && (
+              <p className="text-sm sm:text-base text-muted-foreground mt-2 leading-relaxed">
+                The only panel that hugs your curves, no tools, no tradesman, in 30 minutes
+              </p>
+            )}
+
             {isFlexibleAcousticPanel && (
               <div className="mt-2 flex flex-col gap-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -268,9 +322,11 @@ export default function ClientProductPage({
                     ({isFrenchVersion ? "2847 avis verifies" : "1080"})
                   </span>
                 </div>
-                {/* FR: Enhanced social proof badges */}
+                {/* FR/UK: Enhanced social proof badges */}
                 {isFrenchVersion ? (
                   <SocialProofInlineFr />
+                ) : isUKVersion ? (
+                  <SocialProofInlineUK />
                 ) : (
                   <p className="text-sm">
                     <span className="font-semibold">4500+ bought</span>{" "}
@@ -287,7 +343,7 @@ export default function ClientProductPage({
                 </span>
                 <div className="flex items-baseline gap-2 flex-wrap">
                   <span className="text-xl sm:text-2xl font-medium text-red-600">-{discountPercent}%</span>
-                  <span className="text-2xl sm:text-3xl font-medium text-foreground">{isFrenchVersion ? "€" : "£"}{Math.floor(product.price)}</span>
+                  <span className="text-2xl sm:text-3xl font-medium text-foreground">{currencySymbol}{Math.floor(product.price)}</span>
                   <span className="text-sm align-top relative -top-2">
                     {((product.price % 1) * 100).toFixed(0).padStart(2, "0")}
                   </span>
@@ -298,7 +354,7 @@ export default function ClientProductPage({
                 <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                   <span className="text-sm text-muted-foreground">{isFrenchVersion ? "Prix habituel:" : "Typical price:"}</span>
                   <span className="text-sm text-muted-foreground line-through">
-                    {isFrenchVersion ? "€" : "£"}{product.originalPrice.toFixed(2)}
+                    {currencySymbol}{product.originalPrice.toFixed(2)}
                   </span>
                   {!isFrenchVersion && (
                     <span className="text-xs font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
@@ -310,15 +366,17 @@ export default function ClientProductPage({
                 {isFlexibleAcousticPanel && (
                   isFrenchVersion ? (
                     <StockUrgencyBarFr />
+                  ) : isUKVersion ? (
+                    <StockUrgencyBarUK />
                   ) : (
                     <p className="text-xs text-muted-foreground mt-2">Limited batch / Introductory offer — Only a few batches available</p>
                   )
                 )}
-                {isFlexibleAcousticPanel && !isFrenchVersion && <PeopleViewing isFrench={isFrenchVersion} />}
+                {isFlexibleAcousticPanel && !isFrenchVersion && !isUKVersion && <PeopleViewing isFrench={isFrenchVersion} />}
               </div>
             ) : (
               <div className="mt-4">
-                <p className="font-serif text-2xl">{isFrenchVersion ? "€" : "£"}{product.price}</p>
+                <p className="font-serif text-2xl">{currencySymbol}{product.price}</p>
               </div>
             )}
 
@@ -449,8 +507,9 @@ export default function ClientProductPage({
               <AddToCartButton 
                 product={product} 
                 isFrenchVersion={isFrenchVersion} 
-                isEnglishFlexibleAcoustic={!isFrenchVersion && isFlexibleAcousticPanel}
-                onAddedToCart={isFrenchVersion ? handleFrAddedToCart : undefined}
+                isEnglishFlexibleAcoustic={!isFrenchVersion && !isUKVersion && isFlexibleAcousticPanel}
+                isUKVersion={isUKVersion}
+                onAddedToCart={isFrenchVersion ? handleFrAddedToCart : isUKVersion ? handleUKAddedToCart : undefined}
               />
               {!isFrenchVersion && isFlexibleAcousticPanel && (
                 <p className="text-center text-xs text-muted-foreground">
@@ -503,7 +562,7 @@ export default function ClientProductPage({
                             <h3 className="text-[10px] sm:text-xs font-medium leading-tight line-clamp-2">
                               {bundleProduct.name}
                             </h3>
-                            <p className="text-[10px] sm:text-xs font-semibold mt-0.5">{isFrenchVersion ? "€" : "£"}{bundleProduct.price}</p>
+                            <p className="text-[10px] sm:text-xs font-semibold mt-0.5">{currencySymbol}{bundleProduct.price}</p>
                           </div>
                         </div>
                         {index < frequentlyBoughtTogether.length - 1 && (
@@ -517,7 +576,7 @@ export default function ClientProductPage({
                   <div className="flex items-center justify-between gap-3 pt-3 border-t border-border">
                     <div>
                       <p className="text-xs text-muted-foreground">{isFrenchVersion ? "Prix total:" : "Total price:"}</p>
-                      <p className="text-lg font-semibold">{isFrenchVersion ? "€" : "£"}{frequentlyBoughtTotal.toFixed(2)}</p>
+                      <p className="text-lg font-semibold">{currencySymbol}{frequentlyBoughtTotal.toFixed(2)}</p>
                     </div>
                     <button
                       type="button"
@@ -531,11 +590,13 @@ export default function ClientProductPage({
               </div>
             )}
 
-            {/* Panel Calculator - FR only */}
+            {/* Panel Calculator - FR and UK */}
             {isFrenchVersion && isFlexibleAcousticPanel && <PanelCalculatorFr />}
+            {isUKVersion && isFlexibleAcousticPanel && <PanelCalculatorUK />}
 
-            {/* Video Gallery - FR only */}
+            {/* Video Gallery - FR and UK */}
             {isFrenchVersion && isFlexibleAcousticPanel && <VideoGalleryFr />}
+            {isUKVersion && isFlexibleAcousticPanel && <VideoGalleryUK />}
 
             {/* Acoustic Line Section - Only for Flexible Acoustic Panel */}
             {isFlexibleAcousticPanel && (
@@ -632,17 +693,23 @@ export default function ClientProductPage({
         {/* Product Description Section */}
         {isFlexibleAcousticPanel && <ProductDescriptionSection />}
 
-        {/* FAQ Section - FR only - before reviews */}
+        {/* FAQ Section - FR and UK - before reviews */}
         {isFrenchVersion && isFlexibleAcousticPanel && (
           <div className="mx-auto max-w-4xl">
             <FAQSectionFr />
           </div>
         )}
+        {isUKVersion && isFlexibleAcousticPanel && (
+          <div className="mx-auto max-w-4xl">
+            <FAQSectionUK />
+          </div>
+        )}
 
-        {/* Customer Reviews Section with Rating Breakdown for FR */}
+        {/* Customer Reviews Section with Rating Breakdown for FR and UK */}
         {isFlexibleAcousticPanel && (
           <div className="mt-12 sm:mt-16">
             {isFrenchVersion && <RatingBreakdownFr />}
+            {isUKVersion && <RatingBreakdownUK />}
             <CustomerReviews isFrench={isFrenchVersion} />
           </div>
         )}
@@ -736,11 +803,100 @@ export default function ClientProductPage({
           </section>
         )}
 
+        {/* UK Order Summary — appears after Order Now is clicked */}
+        {isUKVersion && frOrderData && (
+          <section 
+            id="order-summary-uk" 
+            className="mt-12 sm:mt-16 scroll-mt-8 border-2 border-[#FF6B00] rounded-xl bg-orange-50/50 p-6 sm:p-8"
+          >
+            <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">Your Order Summary</h2>
+            
+            {/* Bonus Progress Bar */}
+            <BonusProgressBar currentTotal={frOrderData.totalPrice} threshold={85} className="mb-6" />
+            
+            {/* Product summary */}
+            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-orange-200">
+              <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-white flex-shrink-0 border border-orange-200">
+                <Image
+                  src={product.images?.[0] || product.image || "/placeholder.svg"}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-base">{product.name}</p>
+                <p className="text-sm text-muted-foreground">Qty: {frOrderData.qty}</p>
+              </div>
+              <p className="text-lg font-bold">£{frOrderData.totalPrice.toFixed(2)}</p>
+            </div>
+
+            {/* LED kit bonus — shown when total >= £85 */}
+            {frOrderData.totalPrice >= 85 && (
+              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-orange-200 bg-emerald-50 rounded-lg p-3 -mx-3">
+                <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-white flex-shrink-0 border border-emerald-300">
+                  <Image
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LED0101-NcQN4b3GARfX7EQhQSIcnMbQB9NsFa.jpg"
+                    alt="Recessed LED Strip Kit"
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-emerald-800">Recessed LED Strip Kit</p>
+                  <p className="text-xs text-emerald-700">FREE with orders over £85</p>
+                </div>
+                <p className="text-sm font-semibold text-emerald-700 line-through opacity-60">£42.00</p>
+              </div>
+            )}
+
+            {/* Guarantees */}
+            <div className="grid grid-cols-2 gap-3 mb-6 text-xs sm:text-sm">
+              <div className="flex items-center gap-2">
+                <Truck className="h-4 w-4 text-green-600 flex-shrink-0" />
+                <span>Free Delivery</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <RotateCcw className="h-4 w-4 text-green-600 flex-shrink-0" />
+                <span>30-Day Returns</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-green-600 flex-shrink-0" />
+                <span>100% Secure Payment</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                <span>2-Year Warranty</span>
+              </div>
+            </div>
+
+            {/* Total */}
+            <div className="flex items-center justify-between mb-6 pt-4 border-t border-orange-200">
+              <span className="text-lg font-bold">Total</span>
+              <span className="text-2xl font-bold text-[#FF6B00]">£{frOrderData.totalPrice.toFixed(2)}</span>
+            </div>
+
+            {/* CTA Button */}
+            <button
+              type="button"
+              onClick={handleUKFinalizeOrder}
+              className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold text-lg py-4 px-8 transition-colors duration-200 shadow-lg"
+            >
+              <Shield className="h-5 w-5 flex-shrink-0" />
+              Complete My Order
+            </button>
+            <p className="text-center text-xs text-muted-foreground mt-3">
+              SSL Secure Payment • Visa, Mastercard, American Express
+            </p>
+          </section>
+        )}
+
         {/* Recessed LED Strip Section */}
         {isRecessedLedStrip && <RecessedLedSection />}
 
-        {/* Related Products - Hide for French version */}
-        {relatedProducts.length > 0 && !isFrenchVersion && (
+        {/* Related Products - Hide for French and UK version */}
+        {relatedProducts.length > 0 && !isFrenchVersion && !isUKVersion && (
           <section className="mt-16 sm:mt-24">
             <h2 className="mb-6 sm:mb-8 font-serif text-xl sm:text-2xl">You May Also Like</h2>
             <div className="grid gap-4 sm:gap-8 grid-cols-2 lg:grid-cols-4">
@@ -787,6 +943,20 @@ export default function ClientProductPage({
                     addButton.click()
                   }
                 }
+              } else if (isUKVersion) {
+                // UK: if Order Summary already visible, scroll to it; otherwise click the add button
+                if (frOrderData) {
+                  const orderSummary = document.getElementById("order-summary-uk")
+                  if (orderSummary) {
+                    orderSummary.scrollIntoView({ behavior: "smooth", block: "start" })
+                  }
+                } else {
+                  const addButton = document.querySelector("[data-add-to-cart]") as HTMLElement
+                  if (addButton) {
+                    addButton.scrollIntoView({ behavior: "smooth", block: "center" })
+                    addButton.click()
+                  }
+                }
               } else {
                 const addButton = document.querySelector("[data-add-to-cart]") as HTMLButtonElement
                 if (addButton) {
@@ -799,7 +969,9 @@ export default function ClientProductPage({
             <ShoppingCart className="h-5 w-5 flex-shrink-0" />
             {isFrenchVersion 
               ? (frOrderData ? "Finaliser Ma Commande" : "Commander Maintenant") 
-              : "Order Now £60.00"}
+              : isUKVersion 
+                ? (frOrderData ? "Complete My Order" : "Order Now £12.50")
+                : "Order Now £60.00"}
           </button>
           <p className="text-center text-[10px] text-muted-foreground mt-1.5">
             {isFrenchVersion ? "Paiement 100% Sécurisé • Livraison 5-8 jours" : "100% Secure Payment • Delivery 5-8 days"}
@@ -807,18 +979,11 @@ export default function ClientProductPage({
         </div>
       )}
 
-      {/* Sticky Cart Bar for Desktop - FR only */}
+      {/* Sticky Cart Bar for Desktop - FR and UK */}
       {isFrenchVersion && isFlexibleAcousticPanel && <StickyCartBarFr />}
+      {isUKVersion && isFlexibleAcousticPanel && <StickyCartBarUK />}
 
-      {/* Bonus Modal - FR only */}
-      {isFrenchVersion && (
-        <BonusModalFr
-          isOpen={showBonusModal}
-          onClose={() => setShowBonusModal(false)}
-          onAcceptBonus={handleAcceptBonus}
-          onDeclineBonus={handleDeclineBonus}
-        />
-      )}
+      
     </div>
   )
 }

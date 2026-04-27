@@ -5,12 +5,12 @@ import { useCart } from "@/lib/cart-context"
 import { useRouter, usePathname } from "next/navigation"
 import { ShoppingCart, Lock } from "lucide-react"
 
-interface StickyCartBarFrProps {
-  selectedPrice?: number
-  originalPrice?: number
+interface StickyCartBarUKProps {
+  product?: any
+  onFinalizeOrder?: () => void
 }
 
-export function StickyCartBarFr({ selectedPrice = 24.90, originalPrice = 29.80 }: StickyCartBarFrProps) {
+export function StickyCartBarUK({ product, onFinalizeOrder }: StickyCartBarUKProps) {
   const [visible, setVisible] = useState(false)
   const { totalItems, totalPrice } = useCart()
   const router = useRouter()
@@ -39,8 +39,11 @@ export function StickyCartBarFr({ selectedPrice = 24.90, originalPrice = 29.80 }
   }
 
   const handleFinishOrder = () => {
-    // Go directly to checkout
-    router.push("/checkout-fr")
+    if (onFinalizeOrder) {
+      onFinalizeOrder()
+    } else {
+      router.push("/checkout-uk")
+    }
   }
 
   return (
@@ -59,14 +62,14 @@ export function StickyCartBarFr({ selectedPrice = 24.90, originalPrice = 29.80 }
                 <ShoppingCart className="w-5 h-5 text-[#C8522A]" />
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className="text-sm font-medium text-[#FAF7F2]">{totalItems} article{totalItems > 1 ? "s" : ""} dans votre panier</span>
-                <span className="text-xs text-[#FAF7F2]/60">Prêt à être expédié</span>
+                <span className="text-sm font-medium text-[#FAF7F2]">{totalItems} item{totalItems > 1 ? "s" : ""} in your basket</span>
+                <span className="text-xs text-[#FAF7F2]/60">Ready to dispatch</span>
               </div>
             </div>
 
             {/* Total price */}
             <div className="flex items-baseline gap-2">
-              <span className="text-lg font-bold text-[#FAF7F2]">Total : {totalPrice.toFixed(2).replace(".", ",")} EUR</span>
+              <span className="text-lg font-bold text-[#FAF7F2]">Total: £{totalPrice.toFixed(2)}</span>
             </div>
 
             {/* Finalize CTA */}
@@ -76,7 +79,7 @@ export function StickyCartBarFr({ selectedPrice = 24.90, originalPrice = 29.80 }
               className="px-6 py-2.5 bg-[#22C55E] text-white rounded-lg text-sm font-medium whitespace-nowrap hover:bg-[#16A34A] active:scale-[0.97] transition-all flex-1 sm:flex-none text-center flex items-center justify-center gap-2"
             >
               <Lock className="w-4 h-4" />
-              Finaliser ma commande
+              Complete my order
             </button>
           </>
         )}

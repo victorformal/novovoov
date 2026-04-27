@@ -28,6 +28,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   // Check if this is a French version product
   const isFrenchVersion = slug.endsWith("-fr")
   
+  // Check if this is a UK version product (English with GBP)
+  const isUKVersion = slug.endsWith("-uk")
+  
   // Get products for "Frequently bought together" section (use French versions if on French page)
   const wallCleanerProduct = products.find((p) => 
     p.id === (isFrenchVersion ? "prod_U2rvHwRWU8IYTd" : "prod_U2rvasMPkTpnoe") && p.id !== product.id
@@ -50,7 +53,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     return true
   }).slice(0, 6)
 
-  const isFlexibleAcousticPanel = product.id === "prod_U4kuSjp9pwoOzo" || product.id === "prod_U2rumuoWXebtgj"
+  const isFlexibleAcousticPanel = product.id === "prod_U4kuSjp9pwoOzo" || product.id === "prod_U2rumuoWXebtgj" || product.id === "prod_UK_flexible_acoustic"
   const isRecessedLedStrip = product.slug === "recessed-led-strip-lighting" || product.slug === "recessed-led-strip-lighting-fr"
   const isTableauMadrid = product.id === "prod_U2rvgYxfRGaGl7"
 
@@ -76,6 +79,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       isRecessedLedStrip={isRecessedLedStrip}
       discountPercent={discountPercent}
       isFrenchVersion={isFrenchVersion}
+      isUKVersion={isUKVersion}
     />
   )
 }
