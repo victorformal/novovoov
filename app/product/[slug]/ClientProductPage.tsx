@@ -238,20 +238,8 @@ export default function ClientProductPage({
         />
       )}
 
-      {/* Exit intent popup — UK only */}
-      {isUKVersion && (
-        <ExitIntentPopup
-          onConfirm={() => {
-            const btn = document.querySelector("[data-add-to-cart]") as HTMLButtonElement
-            if (btn) {
-              btn.scrollIntoView({ behavior: "smooth" })
-            }
-          }}
-        />
-      )}
-
-      {/* Exit intent popup — EN Flexible Acoustic Panel only */}
-      {!isFrenchVersion && isFlexibleAcousticPanel && (
+      {/* Exit intent popup — EN Flexible Acoustic Panel only (not UK) */}
+      {!isFrenchVersion && !isUKVersion && isFlexibleAcousticPanel && (
         <ExitIntentPopup
           onConfirm={() => {
             const btn = document.querySelector("[data-add-to-cart]") as HTMLButtonElement
@@ -920,8 +908,8 @@ export default function ClientProductPage({
         )}
       </div>
 
-      {/* Sticky CTA for Mobile — aparece quando o botão principal sai da tela */}
-      {isFlexibleAcousticPanel && showStickyCta && (
+      {/* Sticky CTA for Mobile — aparece quando o botão principal sai da tela (FR e EN apenas, não UK) */}
+      {isFlexibleAcousticPanel && !isUKVersion && showStickyCta && (
         <div className="fixed bottom-0 left-0 right-0 lg:hidden z-30 bg-white border-t border-border shadow-[0_-4px_16px_rgba(0,0,0,0.12)] px-4 py-3">
           <button
             type="button"
@@ -930,20 +918,6 @@ export default function ClientProductPage({
                 // FR: if Order Summary already visible, scroll to it; otherwise click the add button
                 if (frOrderData) {
                   const orderSummary = document.getElementById("order-summary-fr")
-                  if (orderSummary) {
-                    orderSummary.scrollIntoView({ behavior: "smooth", block: "start" })
-                  }
-                } else {
-                  const addButton = document.querySelector("[data-add-to-cart]") as HTMLElement
-                  if (addButton) {
-                    addButton.scrollIntoView({ behavior: "smooth", block: "center" })
-                    addButton.click()
-                  }
-                }
-              } else if (isUKVersion) {
-                // UK: if Order Summary already visible, scroll to it; otherwise click the add button
-                if (frOrderData) {
-                  const orderSummary = document.getElementById("order-summary-uk")
                   if (orderSummary) {
                     orderSummary.scrollIntoView({ behavior: "smooth", block: "start" })
                   }
@@ -966,9 +940,7 @@ export default function ClientProductPage({
             <ShoppingCart className="h-5 w-5 flex-shrink-0" />
             {isFrenchVersion 
               ? (frOrderData ? "Finaliser Ma Commande" : "Commander Maintenant") 
-              : isUKVersion 
-                ? (frOrderData ? "Complete My Order" : "Order Now £12.50")
-                : "Order Now £60.00"}
+              : "Order Now £60.00"}
           </button>
           <p className="text-center text-[10px] text-muted-foreground mt-1.5">
             {isFrenchVersion ? "Paiement 100% Sécurisé • Livraison 5-8 jours" : "100% Secure Payment • Delivery 5-8 days"}
