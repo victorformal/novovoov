@@ -11,6 +11,7 @@ import { trackAddToCart as trackTikTokAddToCart } from "@/lib/tiktok-events"
 import { getFbpFbc } from "@/lib/fbp-fbc"
 import { getStoredUTMs } from "@/lib/utm-client"
 import { BonusModalFr } from "@/components/bonus-modal-fr"
+import { BonusModalUK } from "@/components/bonus-modal-uk"
 
 interface AddToCartButtonProps {
   product: Product
@@ -18,7 +19,8 @@ interface AddToCartButtonProps {
   className?: string
   isFrenchVersion?: boolean
   isEnglishFlexibleAcoustic?: boolean
-  /** Callback fired after item is added to cart (FR only) — used for silent add + scroll behavior */
+  isUKVersion?: boolean
+  /** Callback fired after item is added to cart (FR/UK) — used for silent add + scroll behavior */
   onAddedToCart?: (orderData: { qty: number; price: number; totalPrice: number; ledFree: boolean }) => void
 }
 
@@ -40,7 +42,19 @@ const enQuantities = [
   { qty: 6, price: 85.00, label: "6 Panels", badge: "Best Value", savings: "£22.40", freeShipping: true },
 ]
 
-export function AddToCartButton({ product, variant = "default", className, isFrenchVersion = false, isEnglishFlexibleAcoustic = false, onAddedToCart }: AddToCartButtonProps) {
+// UK upsell quantity options for Flexible Acoustic Panel (GBP)
+const ukQuantities = [
+  { qty: 1, price: 12.50, label: "1 Panel", badge: null, savings: null, freeShipping: false },
+  { qty: 2, price: 22.50, label: "2 Panels", badge: null, savings: "£2.50", freeShipping: false },
+  { qty: 4, price: 42.00, label: "4 Panels", badge: "Most Popular", savings: "£8.00", freeShipping: true },
+  { qty: 6, price: 60.00, label: "6 Panels", badge: "Best Value", savings: "£15.00", freeShipping: true },
+  { qty: 8, price: 75.00, label: "8 Panels", badge: "Pro Pack", savings: "£25.00", freeShipping: true },
+]
+
+// UK LED bonus threshold (£85)
+const UK_LED_BONUS_THRESHOLD = 85
+
+export function AddToCartButton({ product, variant = "default", className, isFrenchVersion = false, isEnglishFlexibleAcoustic = false, isUKVersion = false, onAddedToCart }: AddToCartButtonProps) {
   const { addItem, items } = useCart()
   const router = useRouter()
 
@@ -54,7 +68,9 @@ export function AddToCartButton({ product, variant = "default", className, isFre
   const [pendingOrderData, setPendingOrderData] = useState<{ qty: number; price: number; totalPrice: number; ledFree: boolean } | null>(null)
   // EN Flexible Acoustic: default to 4 panels option (index 2)
   const [selectedQtyOptionEn, setSelectedQtyOptionEn] = useState(enQuantities[2])
-  // Non-FR/EN flexible: simple quantity
+  // UK Flexible Acoustic: default to 4 panels option (index 2)
+  const [selectedQtyOptionUK, setSelectedQtyOptionUK] = useState(ukQuantities[2])
+  // Non-FR/EN/UK flexible: simple quantity
   const [quantity, setQuantity] = useState(1)
   
   // Determine which option set to use
@@ -77,27 +93,31 @@ export function AddToCartButton({ product, variant = "default", className, isFre
       }
     }
 
-    const usePackages = isFrenchVersion || isEnglishFlexibleAcoustic
+    const usePackages = isFrenchVersion || isEnglishFlexibleAcoustic || isUKVersion
 
     // FR: use override price if provided (custom qty), otherwise use pack price
     const frEffectiveTotal = isFrenchVersion 
       ? (overridePrice ?? selectedQtyOptionFr.price) 
       : 0
 
-    const qty = overrideQty ?? (usePackages ? (isFrenchVersion ? selectedQtyOptionFr.qty : selectedQtyOption.qty) : quantity)
+    const qty = overrideQty ?? (usePackages ? (isFrenchVersion ? selectedQtyOptionFr.qty : isUKVersion ? selectedQtyOptionUK.qty : selectedQtyOption.qty) : quantity)
     const unitPrice = overridePrice ?? (
       isFrenchVersion
         ? frEffectiveTotal / selectedQtyOptionFr.qty
-        : usePackages
-          ? selectedQtyOption.price / selectedQtyOption.qty
-          : (product.salePrice || product.price)
+        : isUKVersion
+          ? selectedQtyOptionUK.price / selectedQtyOptionUK.qty
+          : usePackages
+            ? selectedQtyOption.price / selectedQtyOption.qty
+            : (product.salePrice || product.price)
     )
     const totalValue = overridePrice ?? (
       isFrenchVersion
         ? frEffectiveTotal
-        : usePackages
-          ? selectedQtyOption.price
-          : (product.salePrice || product.price) * quantity
+        : isUKVersion
+          ? selectedQtyOptionUK.price
+          : usePackages
+            ? selectedQtyOption.price
+            : (product.salePrice || product.price) * quantity
     )
 
     const eventId = generateEventId("atc")
@@ -156,10 +176,11 @@ export function AddToCartButton({ product, variant = "default", className, isFre
       }),
     }).catch(console.error)
 
-    // For FR/EN upsell, add the selected qty as a single cart entry with adjusted price
+    // For FR/EN/UK upsell, add the selected qty as a single cart entry with adjusted price
     const frUnitPrice = isFrenchVersion ? frEffectiveTotal / qty : 0
+    const ukUnitPrice = isUKVersion ? selectedQtyOptionUK.price / selectedQtyOptionUK.qty : 0
     const productToAdd = usePackages
-      ? { ...product, price: isFrenchVersion ? frUnitPrice : selectedQtyOption.price / selectedQtyOption.qty }
+      ? { ...product, price: isFrenchVersion ? frUnitPrice : isUKVersion ? ukUnitPrice : selectedQtyOption.price / selectedQtyOption.qty }
       : product
     addItem(productToAdd, qty)
 
@@ -199,6 +220,52 @@ export function AddToCartButton({ product, variant = "default", className, isFre
       }
 
       // FR: Show bonus modal instead of redirecting directly
+      setPendingOrderData({
+        qty: finalQty,
+        price: finalUnitPrice,
+        totalPrice: finalTotalPrice,
+        ledFree: finalLedFree,
+      })
+      setShowBonusModal(true)
+      return
+    }
+
+    // UK: persist order in sessionStorage so /checkout-uk always has data
+    if (isUKVersion) {
+      const finalQty = selectedQtyOptionUK.qty
+      const finalTotalPrice = selectedQtyOptionUK.price
+      const finalUnitPrice = finalTotalPrice / finalQty
+      // LED Kit bonus is unlocked when total >= £85
+      const finalLedFree = finalTotalPrice >= UK_LED_BONUS_THRESHOLD
+      
+      const orderData = {
+        productId: product.id,
+        name: product.name,
+        price: finalUnitPrice,
+        totalPrice: finalTotalPrice,
+        quantity: finalQty,
+        image: product.images?.[0] || product.image || "",
+        currency: "GBP",
+        ledFree: finalLedFree,
+      }
+      try {
+        sessionStorage.setItem("checkout_order_uk", JSON.stringify(orderData))
+      } catch (e) {
+        // sessionStorage not available — cart context will be used as fallback
+      }
+
+      // UK: if callback provided, do silent add + scroll instead of redirect
+      if (onAddedToCart) {
+        onAddedToCart({
+          qty: finalQty,
+          price: finalUnitPrice,
+          totalPrice: finalTotalPrice,
+          ledFree: finalLedFree,
+        })
+        return // Don't redirect — let parent handle scroll to Order Summary
+      }
+
+      // UK: Show bonus modal instead of redirecting directly
       setPendingOrderData({
         qty: finalQty,
         price: finalUnitPrice,
@@ -301,6 +368,99 @@ export function AddToCartButton({ product, variant = "default", className, isFre
           <ShoppingCart className="h-5 w-5 flex-shrink-0" />
           Buy Now - {customTotalFr.toFixed(2).replace(".", ",")} EUR
         </button>
+      </div>
+      </>
+    )
+  }
+
+  // UK Flexible Acoustic Panel version: upsell quantity selector + orange CTA button
+  if (isUKVersion) {
+    const handleUKAcceptBonus = () => {
+      sessionStorage.setItem("checkout_bonus_uk", JSON.stringify({
+        bonusPanels: 5,
+        cleanerIncluded: true,
+        technicianIncluded: true,
+        installationCode: "AXB8930M9",
+        bonusValue: 107.00
+      }))
+      setShowBonusModal(false)
+      router.push("/checkout-uk")
+    }
+
+    const handleUKDeclineBonus = () => {
+      sessionStorage.removeItem("checkout_bonus_uk")
+      setShowBonusModal(false)
+      router.push("/checkout-uk")
+    }
+
+    return (
+      <>
+      <BonusModalUK
+        isOpen={showBonusModal}
+        onClose={() => setShowBonusModal(false)}
+        onAcceptBonus={handleUKAcceptBonus}
+        onDeclineBonus={handleUKDeclineBonus}
+      />
+      <div className="flex flex-col gap-3 w-full">
+        {/* Quantity upsell cards */}
+        <div className="space-y-2">
+          {ukQuantities.map((option) => {
+            const isSelected = selectedQtyOptionUK.qty === option.qty
+            return (
+              <button
+                key={option.qty}
+                type="button"
+                onClick={() => setSelectedQtyOptionUK(option)}
+                className={`w-full rounded-lg border-2 px-4 py-3 transition-all ${
+                  isSelected
+                    ? "border-[#FF6B00] bg-orange-50"
+                    : "border-gray-200 bg-white hover:border-gray-300"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-gray-900">{option.label}</span>
+                    {option.badge && (
+                      <span className={`text-white text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                        option.badge === "Most Popular" ? "bg-green-600" : option.badge === "Pro Pack" ? "bg-purple-600" : "bg-amber-600"
+                      }`}>
+                        {option.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-sm font-bold text-gray-900">£{option.price.toFixed(2)}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  {option.savings ? (
+                    <span className="text-green-700 font-medium">Save {option.savings}</span>
+                  ) : (
+                    <span></span>
+                  )}
+                  {option.freeShipping && (
+                    <span className="text-green-700 font-medium">Free shipping included!</span>
+                  )}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Orange CTA button */}
+        <button
+          type="button"
+          disabled={!product.inStock}
+          onClick={() => handleBuyNow()}
+          data-add-to-cart="true"
+          className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold text-base py-4 px-8 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ShoppingCart className="h-5 w-5 flex-shrink-0" />
+          Order Now £{selectedQtyOptionUK.price.toFixed(2)}
+        </button>
+
+        {/* Reassurance line */}
+        <p className="text-center text-xs text-gray-500">
+          100% Secure Payment &nbsp;|&nbsp; Free Shipping Over £80
+        </p>
       </div>
       </>
     )
