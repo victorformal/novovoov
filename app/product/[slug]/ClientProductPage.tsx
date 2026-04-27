@@ -811,9 +811,6 @@ export default function ClientProductPage({
           >
             <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">Your Order Summary</h2>
             
-            {/* Bonus Progress Bar */}
-            <BonusProgressBar currentTotal={frOrderData.totalPrice} threshold={85} className="mb-6" />
-            
             {/* Product summary */}
             <div className="flex items-center gap-4 mb-6 pb-6 border-b border-orange-200">
               <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-white flex-shrink-0 border border-orange-200">
