@@ -54,26 +54,29 @@ export default function CheckoutFrPage() {
     // Check for bonus data
     try {
       const bonusRaw = sessionStorage.getItem("checkout_bonus_fr")
+      console.log("[v0] checkout-fr: bonusRaw from sessionStorage:", bonusRaw)
       if (bonusRaw) {
         setBonusData(JSON.parse(bonusRaw))
       }
     } catch (e) {
-      // ignore
+      console.log("[v0] checkout-fr: error reading bonus data:", e)
     }
 
     try {
       const raw = sessionStorage.getItem("checkout_order_fr")
+      console.log("[v0] checkout-fr: checkout_order_fr from sessionStorage:", raw)
       if (raw) {
         setStoredOrder(JSON.parse(raw))
         setReady(true)
         return
       }
     } catch (e) {
-      // ignore parse errors
+      console.log("[v0] checkout-fr: error reading order data:", e)
     }
 
     // Fallback: build from cart context (EUR items only)
     const frItems = items.filter((i) => i.product.currency === "EUR")
+    console.log("[v0] checkout-fr: frItems from cart:", frItems.length, "items")
     if (frItems.length > 0) {
       const first = frItems[0]
       const unitPrice = first.product.salePrice || first.product.price
@@ -90,8 +93,33 @@ export default function CheckoutFrPage() {
       return
     }
 
-    // Nothing in sessionStorage or cart → redirect back
-    router.replace("/product/flexible-acoustic-panel-fr")
+    // Wait a bit before redirecting to allow sessionStorage/cart to load
+    // This prevents redirect on initial render when data hasn't loaded yet
+    const timeoutId = setTimeout(() => {
+      // Re-check sessionStorage after delay
+      try {
+        const raw = sessionStorage.getItem("checkout_order_fr")
+        console.log("[v0] checkout-fr: re-checking sessionStorage after delay:", raw)
+        if (raw) {
+          setStoredOrder(JSON.parse(raw))
+          setReady(true)
+          return
+        }
+      } catch (e) {
+        // ignore
+      }
+      
+      // Re-check cart items after delay
+      if (items.filter((i) => i.product.currency === "EUR").length > 0) {
+        console.log("[v0] checkout-fr: found items in cart after delay")
+        return // Don't redirect, let useEffect re-run
+      }
+      
+      console.log("[v0] checkout-fr: no data found, redirecting to product page")
+      router.replace("/product/flexible-acoustic-panel-fr")
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
   }, [items, router])
 
   if (!ready || !storedOrder) return null
