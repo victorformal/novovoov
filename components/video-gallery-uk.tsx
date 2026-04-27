@@ -133,24 +133,32 @@ export function VideoGalleryUK() {
             }}
             onClick={() => toggleVideo(index)}
           >
+            {/* Thumbnail image - always visible until video plays */}
+            <img
+              src={video.poster}
+              alt={`Video ${index + 1} thumbnail`}
+              className={cn(
+                "absolute inset-0 w-full h-full object-cover transition-opacity duration-300 z-[1]",
+                activeIndex === index ? "opacity-0" : "opacity-100"
+              )}
+            />
             <video
               ref={(el) => { videoRefs.current[index] = el }}
               src={video.src}
-              poster={video.poster}
               playsInline
-              preload="metadata"
+              preload="none"
               loop
               muted
               className="w-full h-full object-cover pointer-events-none"
             />
 
             {/* Gradient overlay */}
-            <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black/55 to-transparent rounded-b-2xl lg:rounded-b-[20px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black/55 to-transparent rounded-b-2xl lg:rounded-b-[20px] pointer-events-none z-[2]" />
 
             {/* Play button */}
             <div
               className={cn(
-                "absolute inset-0 flex items-center justify-center transition-opacity duration-200",
+                "absolute inset-0 flex items-center justify-center transition-opacity duration-200 z-[3]",
                 activeIndex === index ? "opacity-0" : "opacity-100"
               )}
             >
@@ -160,7 +168,7 @@ export function VideoGalleryUK() {
             </div>
 
             {/* Badge */}
-            <span className="absolute bottom-3 left-3 bg-accent text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+            <span className="absolute bottom-3 left-3 bg-accent text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full z-[3]">
               {video.label}
             </span>
           </div>
