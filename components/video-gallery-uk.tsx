@@ -8,18 +8,22 @@ const VIDEOS = [
   {
     src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Akupanel%20240%20_%20E%CC%81liminez%20la%20re%CC%81verbe%CC%81ration%20-%20WoodUpp-2-eKZtlhcQPAKFYRd6PK8pXZ3i0Cv4XO.mp4",
     label: "Customer",
+    poster: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LED0101-NcQN4b3GARfX7EQhQSIcnMbQB9NsFa.jpg",
   },
   {
     src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Akupanel%20240%20_%20E%CC%81liminez%20la%20re%CC%81verbe%CC%81ration%20-%20WoodUpp-3-3C4xW1cYlltiGsbtVtdVGi7eLGtkRG.mp4",
     label: "Customer",
+    poster: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LED0202-FgYEc2VLFBKleJV7PYlgETikXoR8mG.jpg",
   },
   {
     src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Akupanel%20240%20_%20E%CC%81liminez%20la%20re%CC%81verbe%CC%81ration%20-%20WoodUpp-4-mSEg1welpEmB59DXWCjwj7MkqFWrJS.mp4",
     label: "Customer",
+    poster: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LED0303-gogSHAtk3fgrlc95hSLuauXIeSc1We.jpg",
   },
   {
     src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Akupanel%20240%20_%20E%CC%81liminez%20la%20re%CC%81verbe%CC%81ration%20-%20WoodUpp-6-0qD7LaI2eTiaRCEsNB9bHJSgXqWdLV.mp4",
     label: "Customer",
+    poster: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LED0333-aAgFPx9MLEjZ1qUmRjKyg0TTMx5AlI.jpg",
   },
 ]
 
@@ -132,25 +136,12 @@ export function VideoGalleryUK() {
             <video
               ref={(el) => { videoRefs.current[index] = el }}
               src={video.src}
+              poster={video.poster}
               playsInline
-              preload="auto"
+              preload="metadata"
               loop
               muted
               className="w-full h-full object-cover pointer-events-none"
-              onLoadedData={(e) => {
-                // Force load first frame for mobile
-                const v = e.currentTarget
-                if (v.readyState >= 2) {
-                  v.currentTime = 0.1
-                }
-              }}
-              onSeeked={(e) => {
-                // Reset to beginning after getting frame
-                const v = e.currentTarget
-                if (v.currentTime > 0 && v.paused) {
-                  v.currentTime = 0
-                }
-              }}
             />
 
             {/* Gradient overlay */}
