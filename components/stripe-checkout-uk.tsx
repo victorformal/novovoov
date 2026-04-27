@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react"
 import { loadStripe } from "@stripe/stripe-js"
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js"
-import { createCheckoutSession } from "@/app/actions/stripe"
+import { createCheckoutSessionUK } from "@/app/actions/stripe"
 import { formatCartForTikTok, storePurchaseData } from "@/lib/tiktok-events"
 import { Loader2, Lock, Gift, Check, Wrench, AlertCircle, RefreshCw } from "lucide-react"
 import Image from "next/image"
@@ -71,7 +71,7 @@ export function StripeCheckoutUK({ items, onInitiateCheckout, bonusData }: Strip
 
       console.log("[v0] Creating UK checkout session for items:", items.length)
       
-      const result = await createCheckoutSession(items, window.location.origin, {
+      const result = await createCheckoutSessionUK(items, window.location.origin, {
         eventId,
         eventSourceUrl: window.location.href,
         fbc,
