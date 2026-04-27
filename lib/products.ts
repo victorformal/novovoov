@@ -420,6 +420,53 @@ export const products: Product[] = [
     material: "Papier Photographique 240g / Bois de Pin 100% reboisement",
   },
 
+  // UK version of Flexible Acoustic Panel (UK market - GBP)
+  {
+    id: "prod_UK_flexible_acoustic",
+    slug: "flexible-acoustic-panel-uk",
+    name: "Flexible Acoustic Panel",
+    description:
+      "Revolutionary bendable acoustic panel that adapts to any surface. Perfect for curved walls, pillars, and creative installations.",
+    longDescription:
+      "Introducing our game-changing Flexible Acoustic Panel—the most versatile wall covering solution on the market. Unlike traditional rigid panels, this innovative design features a specially engineered flexible felt backing that allows the panel to bend and conform to curved surfaces, pillars, and unconventional architectural features. Available in multiple wood tones including Natural Oak, Smoked Oak, Walnut, and Grey Oak, each panel delivers exceptional sound absorption while transforming any space into a design statement. At an incredible 270x110cm, each panel covers nearly 3m² of wall space, making it the most cost-effective premium acoustic solution available.",
+    price: 12.50,
+    originalPrice: 25.00,
+    currency: "GBP",
+    category: "wall-panels",
+    images: [
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Marcenaria%20inteligente%20transforma%20o%20seu%20ambiente.Aqui%2C%20o%20painel%20ripado%20com%20iluminac%CC%A7a%CC%83o%20em%20LED%20vai-yF1rklBPX4o4hpK9rzz1YPn4wkn8tc.jpg",
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau02-qeu9jY1J99l7kquJK3L2fnpKCxJuHj.avif",
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau03-Ji8b2j4tKYBnBXpeqNu9khj7yL7wvV.avif",
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau05-GkWwFoSwI1tdI52JGtLrfokd39EcZ6.avif",
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau06-RN0no924w98dCR2WLKu9Lc5ix1yxsd.avif",
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau08-MDTCtLoI5jgKXB9aMNIgb6jn6rpRlj.avif",
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/panneau10-st1uB7l391OAmADvAE7RopRDYVevb6.avif",
+    ],
+    video: "/videos/akupanel-demo.mp4",
+    videoThumbnail: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Captura%20de%20Tela%202026-04-18%20a%CC%80s%2022.59.26-qTSnVeumLFNhUeew486WTm9czu8Dxz.png",
+    features: [
+      "Flexible backing - adapts to any curve",
+      "270x110cm coverage per piece",
+      "Superior NRC rating of 0.85",
+      "Multiple wood tones available",
+      "Easy DIY installation",
+      "High-density acoustic felt core",
+      "Low formaldehyde emission (0.05 mg/m³)",
+      "SGS tested and certified",
+    ],
+    dimensions: "270cm x 110cm x 2.1cm",
+    material: "MDF Slats / Acoustic Felt Backing",
+    inStock: true,
+    badge: "Bestseller",
+    onSale: true,
+    colors: [
+      { id: "natural-uk", name: "Natural", hex: "#D4B896", image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Gemini_Generated_Image_gv77m0gv77m0gv77-2ZuSE03hVAhko9zJULiZyynQuzvSro.png" },
+      { id: "walnut-uk", name: "Walnut", hex: "#5D4037", image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Gemini_Generated_Image_v6k2hsv6k2hsv6k2-WlF4p8OnMPN9VN2jMsVPIoGPJUxmAU.png" },
+      { id: "black-uk", name: "Black", hex: "#2D2D2D", image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Gemini_Generated_Image_y18qr9y18qr9y18q-nzi1de1MXOo3sji65NDIhMdbxWOdIk.png" },
+      { id: "grey-uk", name: "Grey", hex: "#9E9E9E", image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Gemini_Generated_Image_hoylswhoylswhoyl-IspXGlydLXx9MoShiAKqZWmOiQQpwj.png" },
+    ],
+  },
+
   // Test Product EN
   {
     id: "prod_test_usd_2",
