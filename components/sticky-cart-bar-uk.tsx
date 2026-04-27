@@ -46,9 +46,10 @@ export function StickyCartBarUK({ product, onFinalizeOrder }: StickyCartBarUKPro
     }
   }
 
+  // Hide on mobile to prevent overlap issues
   return (
     <div
-      className={`fixed left-0 right-0 z-[9999] bg-[#2C1810] border-t border-white/10 px-4 py-3 transition-all duration-300 ${
+      className={`hidden md:block fixed left-0 right-0 z-[9999] bg-[#2C1810] border-t border-white/10 px-4 py-3 transition-all duration-300 ${
         visible && hasItemsInCart && !isCheckoutPage ? "bottom-0" : "-bottom-20"
       }`}
       style={{ transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)" }}
