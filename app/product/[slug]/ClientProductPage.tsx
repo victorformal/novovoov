@@ -181,6 +181,7 @@ export default function ClientProductPage({
   }
 
   const handleAcceptBonus = () => {
+    // Save bonus data
     sessionStorage.setItem("checkout_bonus_fr", JSON.stringify({
       bonusPanels: 5,
       cleanerIncluded: true,
@@ -188,12 +189,44 @@ export default function ClientProductPage({
       installationCode: "AXB8930M9",
       bonusValue: 127.00
     }))
+    
+    // Also save the order data so checkout-fr has access to it
+    if (frOrderData) {
+      const orderData = {
+        productId: product.id,
+        name: product.name,
+        price: frOrderData.price,
+        totalPrice: frOrderData.totalPrice,
+        quantity: frOrderData.qty,
+        image: product.images?.[0] || product.image || "",
+        currency: "EUR",
+        ledFree: frOrderData.ledFree,
+      }
+      sessionStorage.setItem("checkout_order_fr", JSON.stringify(orderData))
+    }
+    
     setShowBonusModal(false)
     router.push("/checkout-fr")
   }
 
   const handleDeclineBonus = () => {
     sessionStorage.removeItem("checkout_bonus_fr")
+    
+    // Also save the order data so checkout-fr has access to it
+    if (frOrderData) {
+      const orderData = {
+        productId: product.id,
+        name: product.name,
+        price: frOrderData.price,
+        totalPrice: frOrderData.totalPrice,
+        quantity: frOrderData.qty,
+        image: product.images?.[0] || product.image || "",
+        currency: "EUR",
+        ledFree: frOrderData.ledFree,
+      }
+      sessionStorage.setItem("checkout_order_fr", JSON.stringify(orderData))
+    }
+    
     setShowBonusModal(false)
     router.push("/checkout-fr")
   }
@@ -208,6 +241,7 @@ export default function ClientProductPage({
   }
 
   const handleUKAcceptBonus = () => {
+    // Save bonus data
     sessionStorage.setItem("checkout_bonus_uk", JSON.stringify({
       bonusPanels: 5,
       cleanerIncluded: true,
@@ -215,12 +249,44 @@ export default function ClientProductPage({
       installationCode: "AXB8930M9",
       bonusValue: 107.00
     }))
+    
+    // Also save the order data so checkout-uk has access to it
+    if (frOrderData) {
+      const orderData = {
+        productId: product.id,
+        name: product.name,
+        price: frOrderData.price,
+        totalPrice: frOrderData.totalPrice,
+        quantity: frOrderData.qty,
+        image: product.images?.[0] || product.image || "",
+        currency: "GBP",
+        ledFree: frOrderData.ledFree,
+      }
+      sessionStorage.setItem("checkout_order_uk", JSON.stringify(orderData))
+    }
+    
     setShowBonusModal(false)
     router.push("/checkout-uk")
   }
 
   const handleUKDeclineBonus = () => {
     sessionStorage.removeItem("checkout_bonus_uk")
+    
+    // Also save the order data so checkout-uk has access to it
+    if (frOrderData) {
+      const orderData = {
+        productId: product.id,
+        name: product.name,
+        price: frOrderData.price,
+        totalPrice: frOrderData.totalPrice,
+        quantity: frOrderData.qty,
+        image: product.images?.[0] || product.image || "",
+        currency: "GBP",
+        ledFree: frOrderData.ledFree,
+      }
+      sessionStorage.setItem("checkout_order_uk", JSON.stringify(orderData))
+    }
+    
     setShowBonusModal(false)
     router.push("/checkout-uk")
   }
