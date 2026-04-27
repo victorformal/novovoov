@@ -42,7 +42,7 @@ export function StickyCartBarUK({ product, onFinalizeOrder }: StickyCartBarUKPro
     if (onFinalizeOrder) {
       onFinalizeOrder()
     } else {
-      router.push("/uk/checkout")
+      router.push("/checkout-uk")
     }
   }
 
