@@ -31,13 +31,20 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   // Check if this is a UK version product (English with GBP)
   const isUKVersion = slug.endsWith("-uk")
   
-  // Get products for "Frequently bought together" section (use French versions if on French page)
-  const wallCleanerProduct = products.find((p) => 
-    p.id === (isFrenchVersion ? "prod_U2rvHwRWU8IYTd" : "prod_U2rvasMPkTpnoe") && p.id !== product.id
-  )
-  const ledStripProduct = products.find((p) => 
-    p.id === (isFrenchVersion ? "prod_U2rv6g1To7VPTZ" : "prod_U2rv1ALPGyHHs7") && p.id !== product.id
-  )
+  // Get products for "Frequently bought together" section (use French/UK/EN versions based on page)
+  const wallCleanerProductId = isFrenchVersion 
+    ? "prod_U2rvHwRWU8IYTd" 
+    : isUKVersion 
+      ? "prod_UK_wall_cleaner" 
+      : "prod_U2rvasMPkTpnoe"
+  const ledStripProductId = isFrenchVersion 
+    ? "prod_U2rv6g1To7VPTZ" 
+    : isUKVersion 
+      ? "prod_UK_led_strip" 
+      : "prod_U2rv1ALPGyHHs7"
+  
+  const wallCleanerProduct = products.find((p) => p.id === wallCleanerProductId && p.id !== product.id)
+  const ledStripProduct = products.find((p) => p.id === ledStripProductId && p.id !== product.id)
   const frequentlyBoughtTogether = [wallCleanerProduct, ledStripProduct].filter(Boolean) as typeof products
   const frequentlyBoughtTotal = frequentlyBoughtTogether.reduce((sum, p) => sum + p.price, 0)
   
