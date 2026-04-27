@@ -146,9 +146,10 @@ export default function ClientProductPage({
     })
   }
   
-  // Sticky CTA: show when main CTA button scrolls out of view (for FR, UK or EN Flexible Acoustic)
+// Sticky CTA: show when main CTA button scrolls out of view (for FR or EN Flexible Acoustic only, not UK)
   useEffect(() => {
-    if (!isFrenchVersion && !isUKVersion && !isFlexibleAcousticPanel) return
+  if (!isFrenchVersion && !isFlexibleAcousticPanel) return
+  if (isUKVersion) return // UK has no mobile sticky CTA
     const handleScroll = () => {
       const btn = document.querySelector("[data-add-to-cart]") as HTMLElement | null
       if (btn) {
@@ -156,9 +157,9 @@ export default function ClientProductPage({
         setShowStickyCta(rect.bottom < 0)
       }
     }
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [isFrenchVersion, isUKVersion, isFlexibleAcousticPanel])
+window.addEventListener("scroll", handleScroll, { passive: true })
+  return () => window.removeEventListener("scroll", handleScroll)
+  }, [isFrenchVersion, isFlexibleAcousticPanel, isUKVersion])
 
   const handleAddBothToCart = () => {
     frequentlyBoughtTogether.forEach((bundleProduct) => {
