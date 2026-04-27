@@ -319,7 +319,7 @@ export const products: Product[] = [
     description: "Ideal for removing mould from walls, ceilings, and window frames. No rinsing required, odourless, doesn't discolour surfaces. Bleach-free.",
     longDescription:
       "STARWAX Anti-Mould Wall Cleaner 500ML - Ideal for removing mould from walls, ceilings, and window frames in living spaces. Ready to use: no rinsing required, no unpleasant odour, doesn't stain. Fungicidal according to EN1650 and EN13697 in 15 min at 20C. Bactericidal according to EN1276 and EN13697 in 5 min at 20C. Virucidal on enveloped viruses according to EN 14476 in 1 min at 20C. Suitable for bedrooms, living rooms, painted walls and ceilings, wallpaper, tiles, and joints.",
-    price: 12.50,
+    price: 14.49,
     currency: "GBP",
     category: "decor",
     hidden: true,
