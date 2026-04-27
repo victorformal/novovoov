@@ -225,7 +225,7 @@ window.addEventListener("scroll", handleScroll, { passive: true })
       <ViewContentTracker product={product} />
 
       {/* Sales notification toast — FR and UK */}
-      {(isFrenchVersion || isUKVersion) && <SalesNotificationToast />}
+      {(isFrenchVersion || isUKVersion) && <SalesNotificationToast isUK={isUKVersion} />}
 
       {/* Exit intent popup — FR only */}
       {isFrenchVersion && (

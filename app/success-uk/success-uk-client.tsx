@@ -68,14 +68,19 @@ export default function SuccessUKClient({ sessionId }: { sessionId: string | nul
         // 3) Meta Pixel Purchase client-side
         const sessionValue = sessionData ? (sessionData.amount_total || 0) / 100 : 0
         const sessionCurrency = "GBP"
+        const purchaseEventId = metaEventId || `purchase_${sessionId}`
+        const purchaseData = { value: sessionValue, currency: sessionCurrency, content_type: "product", order_id: sessionId }
 
         if (typeof window !== "undefined" && window.fbq) {
-          window.fbq(
-            "track",
-            "Purchase",
-            { value: sessionValue, currency: sessionCurrency, content_type: "product", order_id: sessionId },
-            { eventID: metaEventId || `purchase_${sessionId}` },
-          )
+          // Dispara para TODOS os pixels inicializados
+          window.fbq("track", "Purchase", purchaseData, { eventID: purchaseEventId })
+          
+          // Dispara especificamente para o pixel UK 1440709523610900
+          window.fbq("trackSingle", "1440709523610900", "Purchase", purchaseData, { eventID: `${purchaseEventId}_uk` })
+          
+          // Dispara também para os outros pixels EUR
+          window.fbq("trackSingle", "992482810135395", "Purchase", purchaseData, { eventID: `${purchaseEventId}_eur` })
+          window.fbq("trackSingle", "1309753271055484", "Purchase", purchaseData, { eventID: `${purchaseEventId}_eur2` })
         }
 
         // 4) TikTok Purchase
