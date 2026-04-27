@@ -25,7 +25,192 @@ interface Review {
 
 interface CustomerReviewsProps {
   isFrench?: boolean
+  isUK?: boolean
 }
+
+// UK reviews with UK locations and April 2026 dates
+const ukReviews: Review[] = [
+  {
+    id: "uk1",
+    author: "James Thompson",
+    rating: 5,
+    title: "Completely transformed my living room",
+    date: "April 25, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Natural Oak",
+    size: "270x110cm",
+    content:
+      "Absolutely love this acoustic panel! Installation was straightforward and it looks stunning behind the TV. The sound quality in the living room has improved dramatically. Conversations no longer echo. Highly recommended!",
+    images: ["/flexible-panel-natural-oak-living-room.jpg"],
+    helpfulCount: 42,
+  },
+  {
+    id: "uk2",
+    author: "Sarah Mitchell",
+    rating: 5,
+    title: "Perfect for remote work",
+    date: "April 23, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Grey",
+    size: "270x110cm",
+    content:
+      "Installed it in my home office and video calls are so much better now. The panel absorbs background noise perfectly. Looks very professional behind me during online meetings.",
+    images: ["/flexible-panel-grey-tv-wall.jpg"],
+    helpfulCount: 38,
+  },
+  {
+    id: "uk3",
+    author: "Emma Watson",
+    rating: 5,
+    title: "Perfect design and function",
+    date: "April 21, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Natural Oak",
+    size: "270x110cm",
+    content:
+      "Excellent quality! My husband and I installed it around the TV. The panel is flexible and adaptable - we were able to work around the electrical sockets easily. It looks absolutely beautiful!",
+    images: ["/flexible-panel-natural-oak-tv-feature.jpg"],
+    helpfulCount: 35,
+  },
+  {
+    id: "uk4",
+    author: "Oliver Brown",
+    rating: 5,
+    title: "Professional gaming setup",
+    date: "April 19, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Black",
+    size: "270x110cm",
+    content:
+      "Installed it with LED lighting and it looks epic! The acoustic absorption is remarkable when gaming online - my microphone picks up much less ambient noise. Perfect investment.",
+    images: ["/flexible-panel-smoked-oak-entertainment.jpg"],
+    helpfulCount: 51,
+  },
+  {
+    id: "uk5",
+    author: "Charlotte Davies",
+    rating: 5,
+    title: "Complete living room renovation",
+    date: "April 17, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Smoked Oak",
+    size: "270x110cm",
+    content:
+      "Never imagined that one panel could make such a difference! Beyond improving acoustics, it has completely transformed the visual appearance of my living room. Highly recommended.",
+    images: ["/flexible-panel-walnut-office.jpg"],
+    helpfulCount: 29,
+  },
+  {
+    id: "uk6",
+    author: "William Harris",
+    rating: 5,
+    title: "Easy to install during renovation",
+    date: "April 15, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Natural Oak",
+    size: "270x110cm",
+    content:
+      "I'm in the final stages of renovating my home. The panel arrived at the perfect time and is very easy to work with. It integrates perfectly with my design vision. Ordering more!",
+    images: ["/flexible-panel-natural-oak-entryway.jpg"],
+    helpfulCount: 22,
+  },
+  {
+    id: "uk7",
+    author: "Sophie Clark",
+    rating: 5,
+    title: "Elegant bathroom solution",
+    date: "April 13, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Natural Oak",
+    size: "270x110cm",
+    content:
+      "Yes, I installed it in the bathroom above the vanity. The panel is durable and the acoustic absorption incredibly reduces echo. Elegant and minimalist. Very satisfied with the result!",
+    images: ["/flexible-panel-bathroom-accent.jpg"],
+    helpfulCount: 18,
+  },
+  {
+    id: "uk8",
+    author: "George Wilson",
+    rating: 5,
+    title: "Premium workspace setup",
+    date: "April 11, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Grey",
+    size: "270x110cm",
+    content:
+      "Sound professional here - this panel delivers on its promises. The absorption is consistent and the design is clean. Perfect for a home studio. Definitely a quality investment.",
+    images: ["/flexible-panel-desk-workspace.jpg"],
+    helpfulCount: 44,
+  },
+  {
+    id: "uk9",
+    author: "Amelia Roberts",
+    rating: 5,
+    title: "Impressive black panel wall",
+    date: "April 9, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Black",
+    size: "270x110cm",
+    content:
+      "Created an accent wall with multiple black panels. The look is modern and sophisticated. The room's acoustics have improved dramatically. All my visitors love it!",
+    images: ["/images/review-staircase-dark-panels.jpg"],
+    helpfulCount: 40,
+  },
+  {
+    id: "uk10",
+    author: "Harry Taylor",
+    rating: 5,
+    title: "Exceptional versatility",
+    date: "April 7, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Natural Oak",
+    size: "270x110cm",
+    content:
+      "Used the panels in multiple areas of my home - living room, office, even open kitchen. The flexibility allows perfect adaptation to any space. Undeniable quality!",
+    images: ["/images/review-modern-kitchen-panels.jpg"],
+    helpfulCount: 37,
+  },
+  {
+    id: "uk11",
+    author: "Mia Anderson",
+    rating: 5,
+    title: "Panel + LED = Perfect combination",
+    date: "April 5, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Natural Oak",
+    size: "270x110cm",
+    content:
+      "Added the vertical LED strips and it looks amazing! The warm lighting showcases the acoustic panels beautifully. Not only has the acoustics improved, but my room's design is completely transformed. Easy installation with the quick connector.",
+    images: [],
+    helpfulCount: 56,
+  },
+  {
+    id: "uk12",
+    author: "Jack Moore",
+    rating: 5,
+    title: "Bedroom LED setup",
+    date: "April 3, 2026",
+    country: "United Kingdom",
+    verified: true,
+    color: "Grey",
+    size: "270x110cm",
+    content:
+      "Installed the grey panels with warm white LED lighting in my bedroom. The atmosphere became very cosy and the acoustics reduced street noise. It's like having a mini-spa at home!",
+    images: [],
+    helpfulCount: 48,
+  },
+]
 
 const reviews: Review[] = [
   {
@@ -340,7 +525,7 @@ const reviews: Review[] = [
 
 const totalReviews = 2847
 
-export function CustomerReviews({ isFrench = false }: CustomerReviewsProps) {
+export function CustomerReviews({ isFrench = false, isUK = false }: CustomerReviewsProps) {
   const [helpfulReviews, setHelpfulReviews] = useState<string[]>([])
 
   const handleHelpful = (reviewId: string) => {
@@ -349,7 +534,9 @@ export function CustomerReviews({ isFrench = false }: CustomerReviewsProps) {
     }
   }
 
-  const averageRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+  // Use UK reviews when isUK is true, otherwise use default reviews
+  const displayReviews = isUK ? ukReviews : reviews
+  const averageRating = displayReviews.reduce((acc, r) => acc + r.rating, 0) / displayReviews.length
 
   return (
     <section className="mt-16 border-t border-border pt-12 overflow-hidden">
@@ -373,7 +560,7 @@ export function CustomerReviews({ isFrench = false }: CustomerReviewsProps) {
 
       {/* Reviews List */}
       <div className="space-y-8">
-        {reviews.map((review) => (
+        {displayReviews.map((review) => (
           <article key={review.id} className="border-b border-border pb-8 last:border-0">
             {/* Author */}
             <div className="flex items-center gap-3 mb-3">

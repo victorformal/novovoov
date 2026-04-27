@@ -699,7 +699,7 @@ window.addEventListener("scroll", handleScroll, { passive: true })
           <div className="mt-12 sm:mt-16">
             {isFrenchVersion && <RatingBreakdownFr />}
             {isUKVersion && <RatingBreakdownUK />}
-            <CustomerReviews isFrench={isFrenchVersion} />
+            <CustomerReviews isFrench={isFrenchVersion} isUK={isUKVersion} />
           </div>
         )}
 
