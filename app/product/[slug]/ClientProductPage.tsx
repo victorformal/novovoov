@@ -503,7 +503,7 @@ export default function ClientProductPage({
 
             {/* Add to Cart */}
             <div className="mt-8 flex flex-col gap-3">
-              {!isFrenchVersion && isFlexibleAcousticPanel && <CountdownTimer />}
+              {!isFrenchVersion && !isUKVersion && isFlexibleAcousticPanel && <CountdownTimer />}
               <AddToCartButton 
                 product={product} 
                 isFrenchVersion={isFrenchVersion} 
