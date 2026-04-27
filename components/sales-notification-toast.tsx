@@ -3,7 +3,11 @@
 import { useState, useEffect } from "react"
 import { Users } from "lucide-react"
 
-export function SalesNotificationToast() {
+interface SalesNotificationToastProps {
+  isUK?: boolean
+}
+
+export function SalesNotificationToast({ isUK = false }: SalesNotificationToastProps) {
   const [visible, setVisible] = useState(false)
   const [buyers, setBuyers] = useState(24)
 
@@ -50,10 +54,10 @@ export function SalesNotificationToast() {
         </div>
         <div className="flex flex-col">
           <span className="text-sm font-semibold text-gray-900">
-            {buyers} personnes
+            {buyers} {isUK ? "people" : "personnes"}
           </span>
           <span className="text-xs text-gray-500">
-            viennent d&apos;acheter
+            {isUK ? "just bought this" : "viennent d'acheter"}
           </span>
         </div>
         <span className="relative flex h-2 w-2 ml-auto flex-shrink-0">
