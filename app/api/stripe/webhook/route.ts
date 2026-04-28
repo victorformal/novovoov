@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { stripe } from "@/lib/stripe"
-import { sendPurchaseEvent } from "@/lib/meta/sendEvent"
+import { sendPurchaseEventToAllPixels } from "@/lib/meta/sendEvent"
 import type Stripe from "stripe"
 
 /**
@@ -135,8 +135,8 @@ async function handlePurchaseEvent(session: Stripe.Checkout.Session) {
       is_free_product: value === 0,
     })
 
-    // Send Purchase event to Meta Conversions API
-    await sendPurchaseEvent({
+    // Send Purchase event to ALL Meta Pixels (including UK pixel 1440709523610900)
+    const results = await sendPurchaseEventToAllPixels({
       value,
       currency,
       orderId: session.id,
@@ -162,7 +162,7 @@ async function handlePurchaseEvent(session: Stripe.Checkout.Session) {
       clientUserAgent: metadata.client_user_agent || undefined,
     })
 
-    console.log("[Stripe Webhook] Purchase event sent successfully")
+    console.log("[Stripe Webhook] Purchase events sent to all pixels:", results.map(r => ({ pixelId: r.pixelId, success: !r.result.error })))
   } catch (error) {
     console.error("[Stripe Webhook] Failed to send Purchase event:", {
       error: error instanceof Error ? error.message : String(error),
@@ -190,7 +190,7 @@ async function handlePaymentIntentPurchase(paymentIntent: Stripe.PaymentIntent) 
       payment_intent_id: paymentIntent.id,
     })
 
-    await sendPurchaseEvent({
+    const results = await sendPurchaseEventToAllPixels({
       value,
       currency,
       orderId: paymentIntent.id,
@@ -207,7 +207,7 @@ async function handlePaymentIntentPurchase(paymentIntent: Stripe.PaymentIntent) 
       clientUserAgent: metadata.client_user_agent || undefined,
     })
 
-    console.log("[Stripe Webhook] PaymentIntent Purchase event sent successfully")
+    console.log("[Stripe Webhook] PaymentIntent Purchase events sent to all pixels:", results.map(r => ({ pixelId: r.pixelId, success: !r.result.error })))
   } catch (error) {
     console.error("[Stripe Webhook] Failed to send PaymentIntent Purchase:", {
       error: error instanceof Error ? error.message : String(error),
