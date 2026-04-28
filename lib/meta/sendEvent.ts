@@ -230,6 +230,109 @@ export async function sendMetaEventForCurrency(
   return _sendToPixel(data, pixel)
 }
 
+// Sends an event directly to the UK pixel 1440709523610900
+export async function sendMetaEventToUKPixel(data: MetaEventData): Promise<MetaApiResponse> {
+  const ukPixel: PixelConfig = {
+    pixelId: "1440709523610900",
+    accessToken: process.env.META_ACCESS_TOKEN_GBP || process.env.META_ACCESS_TOKEN || "",
+  }
+  
+  if (!ukPixel.accessToken) {
+    console.warn("[Meta CAPI] ⚠️ META_ACCESS_TOKEN_GBP não configurado para pixel UK 1440709523610900")
+    return { events_received: 0, messages: ["Access token not configured for UK pixel"] }
+  }
+  
+  return _sendToPixel(data, ukPixel)
+}
+
+// Sends Purchase event to ALL configured pixels (for cross-market tracking)
+export async function sendPurchaseEventToAllPixels(params: {
+  value: number
+  currency: string
+  orderId: string
+  contentIds?: string[]
+  contents?: Array<{ id: string; quantity: number; item_price?: number }>
+  email?: string
+  phone?: string
+  firstName?: string
+  lastName?: string
+  city?: string
+  state?: string
+  zip?: string
+  country?: string
+  externalId?: string
+  clientIpAddress?: string
+  clientUserAgent?: string
+  fbc?: string
+  fbp?: string
+  eventSourceUrl?: string
+  eventId?: string
+  eventTime?: number
+}): Promise<{ pixelId: string; result: MetaApiResponse }[]> {
+  const eventData: MetaEventData = {
+    eventName: "Purchase",
+    eventTime: params.eventTime,
+    eventId: params.eventId,
+    eventSourceUrl: params.eventSourceUrl,
+    actionSource: "website",
+    userData: {
+      email: params.email,
+      phone: params.phone,
+      firstName: params.firstName,
+      lastName: params.lastName,
+      city: params.city,
+      state: params.state,
+      zip: params.zip,
+      country: params.country,
+      externalId: params.externalId,
+      clientIpAddress: params.clientIpAddress,
+      clientUserAgent: params.clientUserAgent,
+      fbc: params.fbc,
+      fbp: params.fbp,
+    },
+    customData: {
+      value: params.value,
+      currency: params.currency,
+      orderId: params.orderId,
+      contentIds: params.contentIds,
+      contents: params.contents,
+      contentType: "product",
+    },
+  }
+
+  const results: { pixelId: string; result: MetaApiResponse }[] = []
+
+  // List of all pixels to send to
+  const pixelsToSend = [
+    { pixelId: "992482810135395", accessToken: process.env.META_ACCESS_TOKEN || process.env.FACEBOOK_TOKEN || "" },
+    { pixelId: "1309753271055484", accessToken: process.env.META_ACCESS_TOKEN_EUR || process.env.META_ACCESS_TOKEN || "" },
+    { pixelId: "1440709523610900", accessToken: process.env.META_ACCESS_TOKEN_GBP || process.env.META_ACCESS_TOKEN || "" },
+  ]
+
+  for (const pixel of pixelsToSend) {
+    if (!pixel.accessToken) {
+      console.warn(`[Meta CAPI] ⚠️ Access token não configurado para pixel ${pixel.pixelId}`)
+      continue
+    }
+
+    try {
+      // Use unique event ID per pixel to avoid deduplication issues
+      const pixelEventData = {
+        ...eventData,
+        eventId: `${params.eventId || params.orderId}_${pixel.pixelId.slice(-4)}`,
+      }
+      const result = await _sendToPixel(pixelEventData, pixel)
+      results.push({ pixelId: pixel.pixelId, result })
+      console.log(`[Meta CAPI] ✅ Purchase enviado para pixel ${pixel.pixelId}`)
+    } catch (error) {
+      console.error(`[Meta CAPI] ❌ Erro ao enviar para pixel ${pixel.pixelId}:`, error)
+      results.push({ pixelId: pixel.pixelId, result: { error: { message: String(error), type: "api_error", code: 500, fbtrace_id: "" } } })
+    }
+  }
+
+  return results
+}
+
 export async function sendPurchaseEvent(params: {
   value: number
   currency: string

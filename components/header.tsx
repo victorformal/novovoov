@@ -17,8 +17,12 @@ const navigation = [
 ]
 
 export function Header() {
-  const { totalItems } = useCart()
+  const { totalItems, items } = useCart()
   const [open, setOpen] = useState(false)
+  
+  // Determine cart URL based on currency of items
+  const hasUKItems = items.some((item) => item.product.currency === "GBP")
+  const cartUrl = hasUKItems ? "/cart-uk" : "/cart"
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-border/50 bg-background/98 backdrop-blur-md supports-[backdrop-filter]:bg-background/80">
@@ -77,7 +81,7 @@ export function Header() {
         </div>
 
         {/* Cart */}
-        <Link href="/cart" className="relative">
+        <Link href={cartUrl} className="relative">
           <Button variant="ghost" size="icon">
             <ShoppingBag className="h-5 w-5" />
             <span className="sr-only">Panier</span>
