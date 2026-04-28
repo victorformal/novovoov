@@ -320,13 +320,89 @@ export function AddToCartButton({ product, variant = "default", className, isFre
     )
   }
 
-  // UK Flexible Acoustic Panel version: simple quantity selector + dark CTA button
+  // UK Flexible Acoustic Panel version: simple quantity selector + Add to Cart + Buy Now buttons
   if (isUKVersion) {
     const ukUnitPrice = product.salePrice || product.price
     const ukTotalPrice = ukUnitPrice * quantity
     
+    const handleAddToCartOnly = () => {
+      // Add to cart without redirect
+      const eventId = generateEventId("atc")
+      trackAddToCart({
+        contentId: product.id,
+        contentName: product.name,
+        quantity: quantity,
+        value: ukTotalPrice,
+        currency: "GBP",
+        eventId,
+      })
+      trackTikTokAddToCart({
+        contents: [{ content_id: product.id, content_type: 'product', content_name: product.name, content_category: product.category, price: ukUnitPrice, num_items: quantity, brand: 'Acoustic Design' }],
+        value: ukTotalPrice,
+        currency: "GBP",
+        description: product.name,
+      })
+      addItem({ ...product, price: ukUnitPrice }, quantity)
+      
+      // Save to sessionStorage
+      const orderData = {
+        productId: product.id,
+        name: product.name,
+        price: ukUnitPrice,
+        totalPrice: ukTotalPrice,
+        quantity: quantity,
+        image: product.images?.[0] || product.image || "",
+        currency: "GBP",
+        ledFree: ukTotalPrice >= UK_LED_BONUS_THRESHOLD,
+      }
+      try {
+        sessionStorage.setItem("checkout_order_uk", JSON.stringify(orderData))
+      } catch (e) {}
+      
+      // Redirect to cart
+      router.push("/cart-uk")
+    }
+    
+    const handleBuyNowDirect = () => {
+      // Add to cart and go directly to checkout
+      const eventId = generateEventId("atc")
+      trackAddToCart({
+        contentId: product.id,
+        contentName: product.name,
+        quantity: quantity,
+        value: ukTotalPrice,
+        currency: "GBP",
+        eventId,
+      })
+      trackTikTokAddToCart({
+        contents: [{ content_id: product.id, content_type: 'product', content_name: product.name, content_category: product.category, price: ukUnitPrice, num_items: quantity, brand: 'Acoustic Design' }],
+        value: ukTotalPrice,
+        currency: "GBP",
+        description: product.name,
+      })
+      addItem({ ...product, price: ukUnitPrice }, quantity)
+      
+      // Save to sessionStorage
+      const orderData = {
+        productId: product.id,
+        name: product.name,
+        price: ukUnitPrice,
+        totalPrice: ukTotalPrice,
+        quantity: quantity,
+        image: product.images?.[0] || product.image || "",
+        currency: "GBP",
+        ledFree: ukTotalPrice >= UK_LED_BONUS_THRESHOLD,
+      }
+      try {
+        sessionStorage.setItem("checkout_order_uk", JSON.stringify(orderData))
+      } catch (e) {}
+      
+      // Go directly to checkout
+      router.push("/checkout-uk")
+    }
+    
     return (
-      <div className="flex flex-col gap-4 w-full items-center">
+      <div className="flex flex-col gap-3 w-full items-center">
         {/* Simple quantity selector */}
         <div className="flex items-center justify-center">
           <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden">
@@ -350,13 +426,24 @@ export function AddToCartButton({ product, variant = "default", className, isFre
           </div>
         </div>
 
-        {/* Dark CTA button */}
+        {/* Add to Cart button (smaller, above Buy Now) */}
         <button
           type="button"
           disabled={!product.inStock}
-          onClick={() => handleBuyNow(quantity, ukTotalPrice)}
+          onClick={handleAddToCartOnly}
+          className="w-full flex items-center justify-center gap-2 rounded-full border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm py-2.5 px-6 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ShoppingCart className="h-4 w-4 flex-shrink-0" />
+          Add to Cart
+        </button>
+
+        {/* Buy Now button (orange, goes to checkout) */}
+        <button
+          type="button"
+          disabled={!product.inStock}
+          onClick={handleBuyNowDirect}
           data-add-to-cart="true"
-          className="w-full flex items-center justify-center gap-3 rounded-full bg-[#2D2D2D] hover:bg-[#1a1a1a] text-white font-semibold text-lg py-4 px-8 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-3 rounded-full bg-[#FF6B00] hover:bg-[#e05e00] text-white font-semibold text-lg py-4 px-8 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <ShoppingCart className="h-5 w-5 flex-shrink-0" />
           Buy Now - £{ukTotalPrice.toFixed(2)}

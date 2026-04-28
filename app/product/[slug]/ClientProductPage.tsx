@@ -192,41 +192,6 @@ window.addEventListener("scroll", handleScroll, { passive: true })
     router.push("/checkout-fr")
   }
 
-  // UK handlers
-  const handleUKAddedToCart = (orderData: { qty: number; price: number; totalPrice: number; ledFree: boolean }) => {
-    setFrOrderData(orderData) // Reusing FR state for UK
-    toast({
-      title: "Product added!",
-      description: `${orderData.qty} panel(s) added to cart`,
-    })
-    // Scroll to Order Summary after a short delay to allow render
-    setTimeout(() => {
-      const orderSummary = document.getElementById("order-summary-uk")
-      if (orderSummary) {
-        orderSummary.scrollIntoView({ behavior: "smooth", block: "start" })
-      }
-    }, 100)
-  }
-
-  // UK: Handle "Complete My Order" button click - go directly to checkout
-  const handleUKFinalizeOrder = () => {
-    // Save the order data so checkout-uk has access to it
-    if (frOrderData) {
-      const orderData = {
-        productId: product.id,
-        name: product.name,
-        price: frOrderData.price,
-        totalPrice: frOrderData.totalPrice,
-        quantity: frOrderData.qty,
-        image: product.images?.[0] || product.image || "",
-        currency: "GBP",
-        ledFree: frOrderData.ledFree,
-      }
-      sessionStorage.setItem("checkout_order_uk", JSON.stringify(orderData))
-    }
-    router.push("/checkout-uk")
-  }
-
   return (
     <div className="py-8 lg:py-12 overflow-x-hidden max-w-full w-full box-border relative">
       <ViewContentTracker product={product} />
@@ -505,7 +470,7 @@ window.addEventListener("scroll", handleScroll, { passive: true })
                 isFrenchVersion={isFrenchVersion} 
                 isEnglishFlexibleAcoustic={!isFrenchVersion && !isUKVersion && isFlexibleAcousticPanel}
                 isUKVersion={isUKVersion}
-                onAddedToCart={isFrenchVersion ? handleFrAddedToCart : isUKVersion ? handleUKAddedToCart : undefined}
+                onAddedToCart={isFrenchVersion ? handleFrAddedToCart : undefined}
               />
               {!isFrenchVersion && isFlexibleAcousticPanel && (
                 <p className="text-center text-xs text-muted-foreground">
@@ -799,91 +764,7 @@ window.addEventListener("scroll", handleScroll, { passive: true })
           </section>
         )}
 
-        {/* UK Order Summary — appears after Order Now is clicked */}
-        {isUKVersion && frOrderData && (
-          <section 
-            id="order-summary-uk" 
-            className="mt-12 sm:mt-16 scroll-mt-8 border-2 border-[#FF6B00] rounded-xl bg-orange-50/50 p-6 sm:p-8"
-          >
-            <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">Your Order Summary</h2>
-            
-            {/* Product summary */}
-            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-orange-200">
-              <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-white flex-shrink-0 border border-orange-200">
-                <Image
-                  src={product.images?.[0] || product.image || "/placeholder.svg"}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-base">{product.name}</p>
-                <p className="text-sm text-muted-foreground">Qty: {frOrderData.qty}</p>
-              </div>
-              <p className="text-lg font-bold">£{frOrderData.totalPrice.toFixed(2)}</p>
-            </div>
-
-            {/* LED kit bonus — shown when total >= £85 */}
-            {frOrderData.totalPrice >= 85 && (
-              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-orange-200 bg-emerald-50 rounded-lg p-3 -mx-3">
-                <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-white flex-shrink-0 border border-emerald-300">
-                  <Image
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/LED0101-NcQN4b3GARfX7EQhQSIcnMbQB9NsFa.jpg"
-                    alt="Recessed LED Strip Kit"
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-emerald-800">Recessed LED Strip Kit</p>
-                  <p className="text-xs text-emerald-700">FREE with orders over £85</p>
-                </div>
-                <p className="text-sm font-semibold text-emerald-700 line-through opacity-60">£42.00</p>
-              </div>
-            )}
-
-            {/* Guarantees */}
-            <div className="grid grid-cols-2 gap-3 mb-6 text-xs sm:text-sm">
-              <div className="flex items-center gap-2">
-                <Truck className="h-4 w-4 text-green-600 flex-shrink-0" />
-                <span>Free Delivery</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <RotateCcw className="h-4 w-4 text-green-600 flex-shrink-0" />
-                <span>30-Day Returns</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-green-600 flex-shrink-0" />
-                <span>100% Secure Payment</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
-                <span>2-Year Warranty</span>
-              </div>
-            </div>
-
-            {/* Total */}
-            <div className="flex items-center justify-between mb-6 pt-4 border-t border-orange-200">
-              <span className="text-lg font-bold">Total</span>
-              <span className="text-2xl font-bold text-[#FF6B00]">£{frOrderData.totalPrice.toFixed(2)}</span>
-            </div>
-
-            {/* CTA Button */}
-            <button
-              type="button"
-              onClick={handleUKFinalizeOrder}
-              className="w-full flex items-center justify-center gap-2 rounded-lg bg-[#FF6B00] hover:bg-[#e05e00] text-white font-bold text-lg py-4 px-8 transition-colors duration-200 shadow-lg"
-            >
-              <Shield className="h-5 w-5 flex-shrink-0" />
-              Complete My Order
-            </button>
-            <p className="text-center text-xs text-muted-foreground mt-3">
-              SSL Secure Payment • Visa, Mastercard, American Express
-            </p>
-          </section>
-        )}
+        
 
         {/* Recessed LED Strip Section */}
         {isRecessedLedStrip && <RecessedLedSection />}
