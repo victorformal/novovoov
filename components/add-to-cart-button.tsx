@@ -213,8 +213,9 @@ export function AddToCartButton({ product, variant = "default", className, isFre
     // UK: persist order in sessionStorage so /checkout-uk always has data
     if (isUKVersion) {
       const finalQty = overrideQty ?? quantity
-      const finalUnitPrice = overridePrice ?? (product.salePrice || product.price)
-      const finalTotalPrice = overridePrice ? overridePrice : finalUnitPrice * finalQty
+      const baseUnitPrice = product.salePrice || product.price
+      const finalTotalPrice = overridePrice ?? (baseUnitPrice * finalQty)
+      const finalUnitPrice = baseUnitPrice
       // LED Kit bonus is unlocked when total >= £85
       const finalLedFree = finalTotalPrice >= UK_LED_BONUS_THRESHOLD
       
@@ -353,7 +354,7 @@ export function AddToCartButton({ product, variant = "default", className, isFre
         <button
           type="button"
           disabled={!product.inStock}
-          onClick={() => handleBuyNow(quantity, ukUnitPrice, ukTotalPrice)}
+          onClick={() => handleBuyNow(quantity, ukTotalPrice)}
           data-add-to-cart="true"
           className="w-full flex items-center justify-center gap-3 rounded-full bg-[#2D2D2D] hover:bg-[#1a1a1a] text-white font-semibold text-lg py-4 px-8 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >

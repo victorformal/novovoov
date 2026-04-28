@@ -199,6 +199,13 @@ window.addEventListener("scroll", handleScroll, { passive: true })
       title: "Product added!",
       description: `${orderData.qty} panel(s) added to cart`,
     })
+    // Scroll to Order Summary after a short delay to allow render
+    setTimeout(() => {
+      const orderSummary = document.getElementById("order-summary-uk")
+      if (orderSummary) {
+        orderSummary.scrollIntoView({ behavior: "smooth", block: "start" })
+      }
+    }, 100)
   }
 
   // UK: Handle "Complete My Order" button click - go directly to checkout
