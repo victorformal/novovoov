@@ -38,54 +38,36 @@ export function ThankYouContent() {
         console.log("[v0] Thank You - Session data:", data)
         setSessionData(data)
 
-        // Send Purchase event to Meta CAPI server-side
-        console.log("[v0] Thank You - Sending Purchase event to Meta...")
-        const metaResponse = await fetch("/api/meta/purchase-from-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ session_id: sessionId }),
-        })
+        // Meta Purchase - Disparado apenas via Stripe Webhook (server-side)
+        // NÃO chamar /api/meta/purchase-from-session - o webhook já cuida disso
+        // Isso evita duplicação de eventos no Meta
 
-        const metaResult = await metaResponse.json()
-        console.log("[v0] Thank You - Meta response:", {
-          ok: metaResult.ok,
-          events_received: metaResult.events_received,
-          fbtrace_id: metaResult.fbtrace_id,
-        })
-
-        // Calculate purchase value
+        // Calculate purchase value for client-side pixel
         const purchaseValue = Number(data.amount_total) / 100
         const purchaseCurrency = (data.currency || "GBP").toUpperCase()
-        const sanitizedEmail = (data.customer_details?.email || "").trim().toLowerCase()
-        const isValidEmail = sanitizedEmail && 
-                            sanitizedEmail !== "null" && 
-                            sanitizedEmail !== "undefined" && 
-                            !sanitizedEmail.includes("example.com") &&
-                            sanitizedEmail.includes("@")
-        const customerEmail = isValidEmail ? sanitizedEmail : undefined
 
         // Parse contents from metadata if available
         let contentIds: string[] = []
-        let contents: any[] = []
         
         if (data.metadata?.content_ids) {
           try {
             contentIds = JSON.parse(data.metadata.content_ids)
-            contents = JSON.parse(data.metadata.contents || "[]")
           } catch (e) {
             console.error("[v0] Failed to parse metadata:", e)
           }
         }
 
-        // Track purchase in Meta Pixel (client-side only)
-        // Purchase event to CAPI is sent via Stripe webhook in backend
+        // Track purchase in Meta Pixel (client-side only) - usa event_id para deduplicação
+        // Usa o mesmo event_id que foi salvo no metadata do checkout
+        const pixelEventId = data.metadata?.purchase_event_id || `purchase_${sessionId}`
         if (data.amount_total) {
           trackPurchase({
             orderId: sessionId,
             contentIds: contentIds,
-            contents: contents,
+            contents: [],
             value: purchaseValue,
             currency: purchaseCurrency,
+            eventId: pixelEventId, // Passa o eventId para deduplicação
           })
         }
 
