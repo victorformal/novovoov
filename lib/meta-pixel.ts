@@ -97,7 +97,7 @@ export function trackInitiateCheckout(params: {
   return eventId
 }
 
-// Track Purchase event (fires ONCE with eventID for deduplication)
+// Track Purchase event (fires ONLY to pixel 1440709523610900 with eventID for deduplication)
 export function trackPurchase(params: {
   orderId: string
   contentIds: string[]
@@ -109,7 +109,8 @@ export function trackPurchase(params: {
   const eventId = params.eventId || `purchase_${params.orderId}`
 
   if (typeof window !== "undefined" && window.fbq) {
-    window.fbq("track", "Purchase", {
+    // Dispara APENAS para o pixel UK 1440709523610900
+    window.fbq("trackSingle", "1440709523610900", "Purchase", {
       content_ids: params.contentIds,
       contents: params.contents,
       content_type: "product",
