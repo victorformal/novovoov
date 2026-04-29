@@ -64,8 +64,8 @@ export default function SuccessUKClient({ sessionId }: { sessionId: string | nul
         const purchaseDataMeta = { value: sessionValue, currency: sessionCurrency, content_type: "product", order_id: sessionId }
 
         if (typeof window !== "undefined" && window.fbq) {
-          // Dispara UMA VEZ com o event_id correto - Meta irá deduplicar com o evento do webhook
-          window.fbq("track", "Purchase", purchaseDataMeta, { eventID: purchaseEventId })
+          // Dispara APENAS para o pixel UK 1440709523610900
+          window.fbq("trackSingle", "1440709523610900", "Purchase", purchaseDataMeta, { eventID: purchaseEventId })
         }
 
         // 4) TikTok Purchase

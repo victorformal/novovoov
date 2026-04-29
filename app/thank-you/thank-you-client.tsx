@@ -57,8 +57,8 @@ export default function ThankYouClient({ sessionId }: { sessionId: string | null
         }
 
         if (typeof window !== "undefined" && window.fbq) {
-          // Dispara UMA VEZ com o event_id correto - Meta irá deduplicar com o evento do webhook
-          window.fbq("track", "Purchase", purchaseData, { eventID: pixelEventId })
+          // Dispara APENAS para o pixel UK 1440709523610900
+          window.fbq("trackSingle", "1440709523610900", "Purchase", purchaseData, { eventID: pixelEventId })
         }
 
         // 4) Track TikTok Purchase

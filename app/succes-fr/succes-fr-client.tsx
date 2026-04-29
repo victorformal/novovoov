@@ -62,8 +62,8 @@ export default function SuccesFrClient({ sessionId }: { sessionId: string | null
         const pixelEventId = sessionData?.metadata?.purchase_event_id || `purchase_${sessionId}`
 
         if (typeof window !== "undefined" && window.fbq) {
-          // Dispara UMA VEZ com o event_id correto - Meta irá deduplicar com o evento do webhook
-          window.fbq("track", "Purchase", { value: sessionValue, currency: sessionCurrency, content_type: "product", order_id: sessionId }, { eventID: pixelEventId })
+          // Dispara APENAS para o pixel UK 1440709523610900
+          window.fbq("trackSingle", "1440709523610900", "Purchase", { value: sessionValue, currency: sessionCurrency, content_type: "product", order_id: sessionId }, { eventID: pixelEventId })
         }
 
         // 4) TikTok Purchase
