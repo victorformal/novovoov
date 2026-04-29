@@ -52,35 +52,20 @@ export default function SuccessUKClient({ sessionId }: { sessionId: string | nul
           setPurchaseData(sessionData)
         }
 
-        // 2) Meta CAPI Purchase (server-side)
-        let metaEventId: string | undefined
-        try {
-          const metaRes = await fetch("/api/meta/purchase-from-session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ session_id: sessionId }),
-            keepalive: true,
-          })
-          const metaJson = await metaRes.json().catch(() => ({}))
-          metaEventId = metaJson?.event_id
-        } catch {}
-
-        // 3) Meta Pixel Purchase client-side
+        // 2) Meta Purchase - Disparado apenas via Stripe Webhook (server-side)
+        // NÃO duplicar aqui - o webhook já envia para todos os pixels com deduplicação
+        // O event_id é gerado no checkout e usado pelo webhook para deduplicação
         const sessionValue = sessionData ? (sessionData.amount_total || 0) / 100 : 0
         const sessionCurrency = "GBP"
-        const purchaseEventId = metaEventId || `purchase_${sessionId}`
-        const purchaseData = { value: sessionValue, currency: sessionCurrency, content_type: "product", order_id: sessionId }
+        
+        // 3) Meta Pixel Purchase client-side - APENAS para deduplicação com o server
+        // Usa o mesmo event_id que foi enviado no metadata do checkout
+        const purchaseEventId = sessionData?.metadata?.purchase_event_id || `purchase_${sessionId}`
+        const purchaseDataMeta = { value: sessionValue, currency: sessionCurrency, content_type: "product", order_id: sessionId }
 
         if (typeof window !== "undefined" && window.fbq) {
-          // Dispara para TODOS os pixels inicializados
-          window.fbq("track", "Purchase", purchaseData, { eventID: purchaseEventId })
-          
-          // Dispara especificamente para o pixel UK 1440709523610900
-          window.fbq("trackSingle", "1440709523610900", "Purchase", purchaseData, { eventID: `${purchaseEventId}_uk` })
-          
-          // Dispara também para os outros pixels EUR
-          window.fbq("trackSingle", "992482810135395", "Purchase", purchaseData, { eventID: `${purchaseEventId}_eur` })
-          window.fbq("trackSingle", "1309753271055484", "Purchase", purchaseData, { eventID: `${purchaseEventId}_eur2` })
+          // Dispara UMA VEZ com o event_id correto - Meta irá deduplicar com o evento do webhook
+          window.fbq("track", "Purchase", purchaseDataMeta, { eventID: purchaseEventId })
         }
 
         // 4) TikTok Purchase

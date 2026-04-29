@@ -51,30 +51,19 @@ export default function SuccesFrClient({ sessionId }: { sessionId: string | null
           setPurchaseData(sessionData)
         }
 
-        // 2) Meta CAPI Purchase (server-side)
-        let metaEventId: string | undefined
-        try {
-          const metaRes = await fetch("/api/meta/purchase-from-session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ session_id: sessionId }),
-            keepalive: true,
-          })
-          const metaJson = await metaRes.json().catch(() => ({}))
-          metaEventId = metaJson?.event_id
-        } catch {}
-
-        // 3) Meta Pixel Purchase client-side
+        // 2) Meta Purchase - Disparado apenas via Stripe Webhook (server-side)
+        // NÃO chamar /api/meta/purchase-from-session - o webhook já cuida disso
+        // Isso evita duplicação de eventos no Meta
+        
+        // 3) Meta Pixel Purchase client-side (deduplicates with CAPI via event_id)
         const sessionValue = sessionData ? (sessionData.amount_total || 0) / 100 : 0
         const sessionCurrency = "EUR"
+        // Usa o mesmo event_id que foi salvo no metadata do checkout
+        const pixelEventId = sessionData?.metadata?.purchase_event_id || `purchase_${sessionId}`
 
         if (typeof window !== "undefined" && window.fbq) {
-          window.fbq(
-            "track",
-            "Purchase",
-            { value: sessionValue, currency: sessionCurrency, content_type: "product", order_id: sessionId },
-            { eventID: metaEventId || `purchase_${sessionId}` },
-          )
+          // Dispara UMA VEZ com o event_id correto - Meta irá deduplicar com o evento do webhook
+          window.fbq("track", "Purchase", { value: sessionValue, currency: sessionCurrency, content_type: "product", order_id: sessionId }, { eventID: pixelEventId })
         }
 
         // 4) TikTok Purchase
