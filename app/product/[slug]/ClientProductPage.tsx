@@ -163,13 +163,13 @@ window.addEventListener("scroll", handleScroll, { passive: true })
 
   const handleAddBothToCart = () => {
     frequentlyBoughtTogether.forEach((bundleProduct) => {
-      addItem({
-        id: bundleProduct.id,
-        name: bundleProduct.name,
-        price: bundleProduct.price,
-        image: bundleProduct.images[0],
-        quantity: 1,
-      })
+      // addItem expects (product, quantity) - pass the full product object and quantity separately
+      addItem(bundleProduct, 1)
+    })
+    // Show toast confirmation
+    toast({
+      title: isUKVersion ? "Added to cart!" : isFrenchVersion ? "Ajouté au panier !" : "Added to cart!",
+      description: isUKVersion ? `${frequentlyBoughtTogether.length} items added` : isFrenchVersion ? `${frequentlyBoughtTogether.length} articles ajoutés` : `${frequentlyBoughtTogether.length} items added`,
     })
   }
 

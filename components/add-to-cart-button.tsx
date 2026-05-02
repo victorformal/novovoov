@@ -10,6 +10,7 @@ import { trackAddToCart, generateEventId } from "@/lib/meta-pixel"
 import { trackAddToCart as trackTikTokAddToCart } from "@/lib/tiktok-events"
 import { getFbpFbc } from "@/lib/fbp-fbc"
 import { getStoredUTMs } from "@/lib/utm-client"
+import { useToast } from "@/hooks/use-toast"
 
 
 interface AddToCartButtonProps {
@@ -47,6 +48,7 @@ const UK_LED_BONUS_THRESHOLD = 85
 export function AddToCartButton({ product, variant = "default", className, isFrenchVersion = false, isEnglishFlexibleAcoustic = false, isUKVersion = false, onAddedToCart }: AddToCartButtonProps) {
   const { addItem, items } = useCart()
   const router = useRouter()
+  const { toast } = useToast()
 
   // FR: default to 8 panels option (index 0)
   const [selectedQtyOptionFr, setSelectedQtyOptionFr] = useState(frQuantities[0])
@@ -326,7 +328,7 @@ export function AddToCartButton({ product, variant = "default", className, isFre
     const ukTotalPrice = ukUnitPrice * quantity
     
     const handleAddToCartOnly = () => {
-      // Add to cart without redirect
+      // Add to cart WITHOUT redirect - just add and show feedback
       const eventId = generateEventId("atc")
       trackAddToCart({
         contentId: product.id,
@@ -359,8 +361,11 @@ export function AddToCartButton({ product, variant = "default", className, isFre
         sessionStorage.setItem("checkout_order_uk", JSON.stringify(orderData))
       } catch (e) {}
       
-      // Redirect to cart
-      router.push("/cart-uk")
+      // Show toast confirmation instead of redirect
+      toast({
+        title: "Added to cart!",
+        description: `${quantity} ${quantity > 1 ? "items" : "item"} added to your cart`,
+      })
     }
     
     const handleBuyNowDirect = () => {
