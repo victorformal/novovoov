@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useCart } from "@/lib/cart-context"
 import { StripeCheckoutUK } from "@/components/stripe-checkout-uk"
-import { ArrowLeft, Lock, Package, RotateCcw, Star, Gift, Check, Wrench } from "lucide-react"
+import { ArrowLeft, Lock, Package, RotateCcw, Star, Gift, Check, Wrench, Minus, Plus } from "lucide-react"
 import { trackInitiateCheckout, generateEventId } from "@/lib/meta-pixel"
 import { getFbpFbc } from "@/lib/fbp-fbc"
 import { getStoredUTMs } from "@/lib/utm-client"
@@ -46,6 +46,7 @@ export default function CheckoutUKPage() {
   const [storedOrder, setStoredOrder] = useState<StoredOrder | null>(null)
   const [bonusData, setBonusData] = useState<BonusData | null>(null)
   const [ready, setReady] = useState(false)
+  const [orderQuantity, setOrderQuantity] = useState(1)
 
   useEffect(() => {
     // Scroll to top when page loads
@@ -64,7 +65,9 @@ export default function CheckoutUKPage() {
     try {
       const raw = sessionStorage.getItem("checkout_order_uk")
       if (raw) {
-        setStoredOrder(JSON.parse(raw))
+        const parsed = JSON.parse(raw)
+        setStoredOrder(parsed)
+        setOrderQuantity(parsed.quantity || 1)
         setReady(true)
         return
       }
@@ -86,6 +89,7 @@ export default function CheckoutUKPage() {
         image: first.product.images?.[0] || first.product.image || "",
         currency: "GBP",
       })
+      setOrderQuantity(first.quantity)
       setReady(true)
       return
     }
@@ -96,22 +100,41 @@ export default function CheckoutUKPage() {
 
   if (!ready || !storedOrder) return null
 
-  const totalGBP = storedOrder.totalPrice
+  // Calculate total based on editable quantity
+  const unitPrice = storedOrder.price
+  const totalGBP = unitPrice * orderQuantity
   const isFreeShipping = totalGBP >= 80
+  
+  // Handler to update quantity
+  const handleQuantityChange = (delta: number) => {
+    const newQty = Math.max(1, Math.min(99, orderQuantity + delta))
+    setOrderQuantity(newQty)
+    
+    // Update sessionStorage with new quantity
+    const updatedOrder = {
+      ...storedOrder,
+      quantity: newQty,
+      totalPrice: unitPrice * newQty,
+      ledFree: (unitPrice * newQty) >= 85,
+    }
+    try {
+      sessionStorage.setItem("checkout_order_uk", JSON.stringify(updatedOrder))
+    } catch (e) {}
+  }
 
-  // Build a cart-like item array for StripeCheckoutUK
+  // Build a cart-like item array for StripeCheckoutUK (using editable quantity)
   const checkoutItems = [
     {
       product: {
         id: storedOrder.productId,
         name: storedOrder.name,
-        price: storedOrder.price,
-        salePrice: storedOrder.price,
+        price: unitPrice,
+        salePrice: unitPrice,
         currency: "GBP" as const,
         image: storedOrder.image,
         images: [storedOrder.image],
       } as any,
-      quantity: storedOrder.quantity,
+      quantity: orderQuantity,
     },
   ]
 
@@ -123,7 +146,7 @@ export default function CheckoutUKPage() {
 
     trackInitiateCheckout({
       contentIds: [storedOrder.productId],
-      numItems: storedOrder.quantity,
+      numItems: orderQuantity,
       value: totalGBP,
       currency: "GBP",
       eventId,
@@ -141,7 +164,7 @@ export default function CheckoutUKPage() {
         pageUrl: window.location.href,
         customData: {
           content_ids: [storedOrder.productId],
-          num_items: storedOrder.quantity,
+          num_items: orderQuantity,
           value: totalGBP,
           currency: "GBP",
           ...utms,
@@ -194,7 +217,28 @@ export default function CheckoutUKPage() {
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium leading-tight">{storedOrder.name}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Qty: {storedOrder.quantity}</p>
+              {/* Quantity selector */}
+              <div className="flex items-center gap-1 mt-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleQuantityChange(-1)}
+                  disabled={orderQuantity <= 1}
+                  className="flex h-7 w-7 items-center justify-center rounded border border-border bg-white text-muted-foreground hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="h-3 w-3" />
+                </button>
+                <span className="w-8 text-center text-sm font-semibold">{orderQuantity}</span>
+                <button
+                  type="button"
+                  onClick={() => handleQuantityChange(1)}
+                  disabled={orderQuantity >= 99}
+                  className="flex h-7 w-7 items-center justify-center rounded border border-border bg-white text-muted-foreground hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="h-3 w-3" />
+                </button>
+              </div>
             </div>
             <p className="text-sm font-semibold flex-shrink-0">£{totalGBP.toFixed(2)}</p>
           </div>
