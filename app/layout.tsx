@@ -38,7 +38,7 @@ export default function RootLayout({
         {/* Facebook Domain Verification */}
         <meta name="facebook-domain-verification" content="ihv7koj9hajrwhdhclgubwhbfk6c22" />
 
-        {/* Meta Pixel Code - Both Pixels initialized together */}
+        {/* Meta Pixel Code - Both Pixels initialized together with Advanced Matching */}
         <Script id="meta-pixel-init" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
@@ -49,9 +49,33 @@ export default function RootLayout({
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            ${pixelId ? `fbq('init', '${pixelId}');` : ''}
-            ${pixelId2 ? `fbq('init', '${pixelId2}');` : ''}
-            fbq('init', '${pixelId3}');
+            
+            // Get stored user data for Advanced Matching if available
+            var storedEmail = '';
+            var storedPhone = '';
+            var storedFn = '';
+            var storedLn = '';
+            try {
+              var userData = localStorage.getItem('meta_user_data');
+              if (userData) {
+                var parsed = JSON.parse(userData);
+                storedEmail = parsed.em || '';
+                storedPhone = parsed.ph || '';
+                storedFn = parsed.fn || '';
+                storedLn = parsed.ln || '';
+              }
+            } catch(e) {}
+            
+            // Build Advanced Matching object (only include non-empty values)
+            var advancedMatching = {};
+            if (storedEmail) advancedMatching.em = storedEmail;
+            if (storedPhone) advancedMatching.ph = storedPhone;
+            if (storedFn) advancedMatching.fn = storedFn;
+            if (storedLn) advancedMatching.ln = storedLn;
+            
+            ${pixelId ? `fbq('init', '${pixelId}', advancedMatching);` : ''}
+            ${pixelId2 ? `fbq('init', '${pixelId2}', advancedMatching);` : ''}
+            fbq('init', '${pixelId3}', advancedMatching);
             fbq('track', 'PageView');
           `}
         </Script>
