@@ -49,6 +49,24 @@ export default function SuccesFrClient({ sessionId }: { sessionId: string | null
         if (sessionRes.ok) {
           sessionData = await sessionRes.json()
           setPurchaseData(sessionData)
+          
+          // Save user data for Meta Advanced Matching (future page loads)
+          const customerDetails = sessionData?.customer_details
+          if (customerDetails) {
+            try {
+              const metaUserData: Record<string, string> = {}
+              if (customerDetails.email) metaUserData.em = customerDetails.email.toLowerCase().trim()
+              if (customerDetails.phone) metaUserData.ph = customerDetails.phone.replace(/[^0-9]/g, '')
+              if (customerDetails.name) {
+                const nameParts = customerDetails.name.trim().split(' ')
+                if (nameParts.length >= 1) metaUserData.fn = nameParts[0].toLowerCase()
+                if (nameParts.length >= 2) metaUserData.ln = nameParts[nameParts.length - 1].toLowerCase()
+              }
+              if (Object.keys(metaUserData).length > 0) {
+                localStorage.setItem('meta_user_data', JSON.stringify(metaUserData))
+              }
+            } catch (e) {}
+          }
         }
 
         // 2) Meta Purchase - Disparado apenas via Stripe Webhook (server-side)
