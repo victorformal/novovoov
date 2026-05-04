@@ -11,7 +11,13 @@ import { trackAddPaymentInfo, formatCartForTikTok, storePurchaseData } from "@/l
 import { Button } from "@/components/ui/button"
 import { Loader2, AlertCircle, RefreshCw } from "lucide-react"
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+
+if (!stripePublishableKey) {
+  console.error("[v0] NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined")
+}
+
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
 
 interface CartItem {
   product: {
