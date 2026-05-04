@@ -19,7 +19,13 @@ interface BonusData {
   bonusValue: number
 }
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+
+if (!stripePublishableKey) {
+  console.error("[v0] NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not defined")
+}
+
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null
 
 interface CartItem {
   product: {
@@ -108,6 +114,22 @@ export function StripeCheckoutUK({ items, onInitiateCheckout, bonusData }: Strip
     setTimeout(() => {
       handleStartCheckout()
     }, 100)
+  }
+
+  if (!stripePromise) {
+    return (
+      <div className="w-full space-y-4">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-red-800">Payment configuration error</p>
+              <p className="text-xs text-red-700 mt-1">Stripe publishable key is not configured. Please contact support.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (error) {
